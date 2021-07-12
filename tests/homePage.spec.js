@@ -1,7 +1,14 @@
 const { test, expect } = require("@playwright/test");
 
-test("basic test", async ({ page }) => {
-  await page.goto("https://playwright.dev/");
-  const name = await page.innerText(".navbar__title");
-  expect(name).toBe("Playwright");
+test.describe("The home page", () => {
+  test("should display the app name with an h1 tag", async ({ page }) => {
+    await page.goto(`http://localhost:${process.env.SERVER_PORT}`);
+
+    const titleTag = await page.$eval(
+      "text=LPoker",
+      (element) => element.tagName
+    );
+
+    expect(titleTag).toBe("H1");
+  });
 });
