@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <h1>LPoker</h1>
+    <% if (!roomId) { %>
+      <form method="POST" action="/create-room">
+        <button type="submit">Create new room</button>
+      </form>
+    <% } %>
+    <% if (roomId) { %>
+      <a href="/<%=roomId%>">Room created: follow me</a>
+    <% } %>
+  </body>
+</html>
