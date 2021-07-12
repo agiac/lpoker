@@ -5,6 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "node  src/main.js",
+    "dev": "nodemon src/main.js",
     "test": "playwright test",
     "lint": "eslint src/** tests/**",
     "lint:fix": "npm run lint -- --fix",
@@ -20,6 +21,7 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.4",
+    "nodemon": "^2.0.12",
     "prettier": "^2.3.2"
   },
   "dependencies": {

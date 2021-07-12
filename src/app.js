@@ -1,15 +1,9 @@
+const path = require("path");
+
 const express = require("express");
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send(`
-    <html>
-        <body>
-            <h1>LPoker</h1>
-        </body>
-    </html>
-  `);
-});
+app.use(express.static(path.join(__dirname, "public")));
 
 exports.app = app;
