@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "description": "A simple poker tool",
   "main": "src/main.js",
-  "type": "module",
   "scripts": {
-    "start": "node src/main.js",
+    "start": "node  src/main.js",
     "test": "playwright test",
     "lint": "eslint src/** tests/**",
     "lint:fix": "npm run lint -- --fix",

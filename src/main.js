@@ -1,1 +1,3 @@
-console.log("All good");
+const { app } = require("./app");
+
+app();
