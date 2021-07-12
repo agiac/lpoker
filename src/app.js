@@ -20,12 +20,18 @@ app.post("/create-room", (req, res) => {
   res.status(303).end();
 });
 
+app.use(express.static(publicFolder));
+
 app.get("/", (req, res) => {
   const { roomId } = req.query;
 
   res.render("index", { roomId });
 });
 
-app.use(express.static(publicFolder));
+app.get("/rooms/:roomId", (req, res) => {
+  const { roomId } = req.params;
+
+  res.render("room", { roomId });
+});
 
 exports.app = app;

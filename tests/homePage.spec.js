@@ -18,6 +18,6 @@ test.describe("The home page", () => {
 
     await page.click("text=Room created: follow me");
 
-    await page.waitForURL(`${homePage}/**`);
+    await page.waitForURL(`${homePage}/rooms/**`);
   });
 });
