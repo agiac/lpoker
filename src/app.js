@@ -13,7 +13,7 @@ app.set("views", viewsFolder);
 app.set("view engine", "ejs");
 
 app.post("/create-room", (req, res) => {
-  const newRoomId = nanoid(5);
+  const newRoomId = nanoid(6);
 
   res.setHeader("Location", `/?roomId=${newRoomId}`);
 
