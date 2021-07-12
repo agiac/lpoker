@@ -1,1 +1,1 @@
-console.log("All good")
+console.log("All good");

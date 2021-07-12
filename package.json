@@ -6,11 +6,20 @@
   "type": "module",
   "scripts": {
     "start": "node src/main.js",
-    "test": "playwright test"
+    "test": "playwright test",
+    "lint": "eslint src/** tests/**",
+    "lint:fix": "npm run lint -- --fix",
+    "format": "prettier --write src/** tests/**",
+    "fix": "npm run format && npm run lint:fix"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.12.3"
+    "@playwright/test": "^1.12.3",
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "prettier": "^2.3.2"
   }
 }
