@@ -1,0 +1,16 @@
+{
+  "name": "lpoker",
+  "version": "0.0.0",
+  "description": "A simple poker tool",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "playwright test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.12.3"
+  }
+}
