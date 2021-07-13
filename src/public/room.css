@@ -10,6 +10,9 @@ main {
 
 #notifications-section {
   grid-area: b;
+  height: 100%;
+  max-height: 80vh;
+  overflow: hidden;
 }
 
 #notifications-list {
@@ -18,7 +21,7 @@ main {
   padding-top: 1rem;
   padding-right: 1rem;
   gap: 1rem;
-  max-height: 90%;
+  max-height: 100%;
   overflow-y: auto;
   text-align: center;
 }
