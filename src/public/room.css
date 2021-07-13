@@ -1,4 +1,4 @@
-main {
+#layout {
   display: grid;
   grid-template-rows: auto 1fr;
   grid-template-columns: auto 1fr;
@@ -10,6 +10,7 @@ main {
 
 #notifications {
   grid-area: b;
+  width: calc(max(200px, 25vw));
 }
 
 #notifications ul {
@@ -17,8 +18,8 @@ main {
   display: flex;
   flex-flow: column;
   gap: 1em;
-  height: 200px;
-  max-height: 200px;
+  height: 400px;
+  max-height: calc(min(400px, 100%));
   overflow-y: hidden;
 }
 
@@ -28,10 +29,14 @@ main {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 200px;
+  height: 400px;
   background: linear-gradient(rgba(255, 255, 255, 0), #fff);
 }
 
 .notificaiton {
   color: lightslategray;
+}
+
+main {
+  grid-area: c;
 }

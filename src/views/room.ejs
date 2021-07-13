@@ -1,22 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LPoker tool</title>
-    <link rel="stylesheet" href="/global.css">
-    <link rel="stylesheet" href="/room.css">
+    <link rel="stylesheet" href="/global.css" />
+    <link rel="stylesheet" href="/room.css" />
   </head>
   <body class="main-layout">
     <header>
       <h1>LPoker</h1>
+      <label>
+        Your name:
+        <input id="name-input" value="<%=roomId%>">
+      </label>
     </header>
-    <main>
-        <h2>Room: <%=roomId%></h2>
-        <aside id="notifications">
-          <ul id="notifications-list">
-          </ul>
-        </aside>
-    </main>
+    <div id="layout">
+      <h2>Room: <%=roomId%></h2>
+      <aside id="notifications">
+        <h3>Notifications</h3>
+        <ul id="notifications-list"></ul>
+      </aside>
+      <main>
+        <form id="voting-form">
+          <fieldset>
+            <legend>Vote</legend>
+            <label>
+              0
+              <input type="radio" name="value" value="0">
+            </label>
+            <label>
+              1
+              <input type="radio" name="value" value="1">
+            </label>
+            <label>
+              2
+              <input type="radio" name="value" value="2">
+            </label>
+            <label>
+              3
+              <input type="radio" name="value" value="3">
+            </label>
+            <label>
+              5
+              <input type="radio" name="value" value="5">
+            </label>
+            <label>
+              8
+              <input type="radio" name="value" value="8">
+            </label>
+            <label>
+              13
+              <input type="radio" name="value" value="13">
+            </label>
+            <label>
+              21
+              <input type="radio" name="value" value="21">
+            </label>
+            <label>
+              ?
+              <input type="radio" name="value" value="?">
+            </label>
+            <button type="submit">Submit</button>
+          </fieldset>
+        </form>
+        <section id="results">
+          <h3>Results</h3>
+        </section>
+      </main>
+    </div>
     <script src="/room.js"></script>
   </body>
 </html>

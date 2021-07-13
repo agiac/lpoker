@@ -1,5 +1,3 @@
-const socket = new WebSocket("ws://localhost:3000");
-
 const sendNotification = (message) => {
   const notificationList = document.getElementById("notifications-list");
 
@@ -18,10 +16,39 @@ const onNewMember = (data) => {
   sendNotification(`User ${data.userId} joined the room`);
 };
 
-socket.addEventListener("message", (event) => {
-  const message = JSON.parse(event.data);
+const createWebSocketConnection = () => {
+  const socket = new WebSocket("ws://localhost:3000");
 
-  if (message.event === "new-member") {
-    onNewMember(message.data);
-  }
-});
+  socket.addEventListener("message", (event) => {
+    const message = JSON.parse(event.data);
+
+    if (message.event === "new-member") {
+      onNewMember(message.data);
+    }
+  });
+};
+
+const onNameChange = (e) => {
+  console.log(e.target.value);
+};
+
+const onVoteSubmit = (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  console.log(Array.from(formData.values()));
+};
+
+const addEventListeners = () => {
+  const nameInput = document.getElementById("name-input");
+  nameInput.addEventListener("keyup", onNameChange);
+
+  const votingForm = document.getElementById("voting-form");
+  votingForm.addEventListener("submit", onVoteSubmit);
+};
+
+const main = () => {
+  createWebSocketConnection();
+  addEventListeners();
+};
+
+main();
