@@ -17,6 +17,7 @@
   "devDependencies": {
     "@playwright/test": "^1.12.3",
     "@types/express": "^4.17.13",
+    "@types/ws": "^7.4.6",
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
@@ -27,6 +28,7 @@
   "dependencies": {
     "ejs": "^3.1.6",
     "express": "^4.17.1",
-    "nanoid": "^3.1.23"
+    "nanoid": "^3.1.23",
+    "ws": "^7.5.3"
   }
 }
