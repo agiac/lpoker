@@ -8,20 +8,30 @@ main {
   gap: 2rem;
 }
 
-#notifications-section {
+#notifications {
   grid-area: b;
-  height: 100%;
-  max-height: 80vh;
-  overflow: hidden;
 }
 
-#notifications-list {
+#notifications ul {
+  position: relative;
   display: flex;
   flex-flow: column;
-  padding-top: 1rem;
-  padding-right: 1rem;
-  gap: 1rem;
-  max-height: 100%;
-  overflow-y: auto;
-  text-align: center;
+  gap: 1em;
+  height: 200px;
+  max-height: 200px;
+  overflow-y: hidden;
+}
+
+#notifications ul::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(rgba(255, 255, 255, 0), #fff);
+}
+
+.notificaiton {
+  color: lightslategray;
 }

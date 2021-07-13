@@ -3,11 +3,15 @@ const socket = new WebSocket("ws://localhost:3000");
 const sendNotification = (message) => {
   const notificationList = document.getElementById("notifications-list");
 
-  const notification = document.createElement("div");
-  notification.className = "flash";
+  const notification = document.createElement("li");
+  notification.className = "notification";
   notification.textContent = message;
 
-  notificationList.appendChild(notification);
+  if (notificationList.children.length === 0) {
+    notificationList.prepend(notification);
+  } else if (notificationList.children.length < 10) {
+    notificationList.appendChild(notification);
+  }
 };
 
 const onNewMember = (data) => {
