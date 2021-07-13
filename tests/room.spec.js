@@ -14,4 +14,21 @@ test.describe("The room page", () => {
 
     expect(roomName).not.toBeNull();
   });
+
+  test("when a new user joins a room, the other participants should be notified", async ({
+    browser,
+  }) => {
+    const user1Context = await browser.newContext();
+    const user2Context = await browser.newContext();
+
+    const user1Page = await user1Context.newPage();
+    const user2Page = await user2Context.newPage();
+
+    await user1Page.goto(roomPage);
+    await user2Page.goto(roomPage);
+
+    const notification = await user1Page.$("text=/User .* joined the room/");
+
+    expect(notification).not.toBeNull();
+  });
 });

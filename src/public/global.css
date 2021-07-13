@@ -13,7 +13,7 @@ body {
   padding: 2rem;
 }
 
-.mainLayout {
+.main-layout {
   display: grid;
   grid-template-rows: auto 1fr;
 }
