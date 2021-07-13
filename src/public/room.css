@@ -1,0 +1,24 @@
+main {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "a a"
+    "b c";
+  gap: 2rem;
+}
+
+#notifications-section {
+  grid-area: b;
+}
+
+#notifications-list {
+  display: flex;
+  flex-flow: column;
+  padding-top: 1rem;
+  padding-right: 1rem;
+  gap: 1rem;
+  max-height: 90%;
+  overflow-y: auto;
+  text-align: center;
+}
