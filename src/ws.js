@@ -4,6 +4,12 @@ const clients = new Map();
 
 const votes = {};
 
+const broadcastAll = (roomId, event) => {
+  Object.keys(votes[roomId]).forEach((client) => {
+    clients.get(client).send(JSON.stringify(event));
+  });
+};
+
 const broadcast = (senderId, roomId, event) => {
   Object.keys(votes[roomId]).forEach((client) => {
     if (client !== senderId) {
@@ -44,6 +50,28 @@ const onVote = (data) => {
   });
 };
 
+const onShowResults = (data) => {
+  const { roomId } = data;
+
+  broadcastAll(roomId, {
+    event: "show-results",
+    data: {
+      votes: votes[roomId],
+    },
+  });
+};
+
+const onNewSession = (data) => {
+  const { roomId } = data;
+
+  broadcastAll(roomId, {
+    event: "new-session",
+    data: {},
+  });
+
+  votes[roomId] = {};
+};
+
 const createWebSocketServer = (httpServer) => {
   const wss = new WebSocket.Server({ server: httpServer });
 
@@ -60,9 +88,33 @@ const createWebSocketServer = (httpServer) => {
           onVote(data);
           break;
 
+        case "show-results":
+          onShowResults(data);
+          break;
+
+        case "new-session":
+          onNewSession(data);
+          break;
+
         default:
           break;
       }
+    });
+
+    ws.on("close", () => {
+      let toRemove;
+
+      clients.forEach((socket, userId) => {
+        if (Object.is(ws, socket)) {
+          toRemove = userId;
+        }
+      });
+
+      Object.keys(votes).forEach((roomId) => {
+        if (votes[roomId][toRemove]) {
+          votes[roomId][toRemove] = undefined;
+        }
+      });
     });
   });
 };

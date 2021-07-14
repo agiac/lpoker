@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/global.css" />
     <link rel="stylesheet" href="/room.css" />
   </head>
-  <body class="main-layout">
+  <body>
     <header>
       <h1>LPoker</h1>
       <ul>
@@ -57,9 +57,14 @@
           <button type="submit">Submit</button>
         </fieldset>
       </form>
+      <section id="controls">
+        <button type="button" id="show-results">Show results</button>
+        <button type="button" id="start-new-session">Start new session</button>
+      </section>
       <div id="layout">
         <section id="results">
           <h3>Results</h3>
+          <ul id="results-list"></ul>
         </section>
         <aside id="notifications">
           <h3>Notifications</h3>

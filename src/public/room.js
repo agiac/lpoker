@@ -2,11 +2,16 @@
 // eslint-disable-next-line no-underscore-dangle
 const { __userId__: userId, __roomId__: roomId } = window;
 
+const clearResults = (resultsList) => {
+  while (resultsList.children.length > 0) {
+    resultsList.removeChild(resultsList.lastChild);
+  }
+};
+
 const sendNotification = (message) => {
   const notificationList = document.getElementById("notifications-list");
 
   const notification = document.createElement("li");
-  notification.className = "notification";
   notification.textContent = message;
 
   if (notificationList.children.length === 0) {
@@ -25,8 +30,28 @@ const onNewMember = (data) => {
 };
 
 const onVote = (data) => {
-  console.log("Voted", data);
   sendNotification(`User ${data.userId} just voted`);
+};
+
+const onShowResults = (data) => {
+  const { votes } = data;
+
+  const resultsList = document.getElementById("results-list");
+
+  clearResults(resultsList);
+
+  Object.entries(votes).forEach(([user, vote]) => {
+    const voteItem = document.createElement("li");
+    voteItem.textContent = `${user}: ${vote}`;
+
+    resultsList.appendChild(voteItem);
+  });
+};
+
+const onNewSession = () => {
+  const resultsList = document.getElementById("results-list");
+
+  clearResults(resultsList);
 };
 
 const createWebSocketConnection = () => {
@@ -44,18 +69,26 @@ const createWebSocketConnection = () => {
     );
   });
 
-  socket.addEventListener("message", (event) => {
-    const message = JSON.parse(event.data);
+  socket.addEventListener("message", (rawEvent) => {
+    const { event, data } = JSON.parse(rawEvent.data);
 
-    console.log(message);
+    console.log({ event, data });
 
-    switch (message.event) {
+    switch (event) {
       case "new-member":
-        onNewMember(message.data);
+        onNewMember(data);
         break;
 
       case "voted":
-        onVote(message.data);
+        onVote(data);
+        break;
+
+      case "show-results":
+        onShowResults(data);
+        break;
+
+      case "new-session":
+        onNewSession();
         break;
 
       default:
@@ -84,9 +117,44 @@ const onVoteSubmit = (socket) => (e) => {
   );
 };
 
+const onShowResultsClick = (socket) => (e) => {
+  e.preventDefault();
+
+  socket.send(
+    JSON.stringify({
+      event: "show-results",
+      data: {
+        roomId,
+      },
+    })
+  );
+};
+
+const onStartNewSessionClick = (socket) => (e) => {
+  e.preventDefault();
+
+  socket.send(
+    JSON.stringify({
+      event: "new-session",
+      data: {
+        roomId,
+      },
+    })
+  );
+};
+
 const addEventListeners = (socket) => {
   const votingForm = document.getElementById("voting-form");
   votingForm.addEventListener("submit", onVoteSubmit(socket));
+
+  const showResultsButton = document.getElementById("show-results");
+  showResultsButton.addEventListener("click", onShowResultsClick(socket));
+
+  const startNewSessionBUtton = document.getElementById("start-new-session");
+  startNewSessionBUtton.addEventListener(
+    "click",
+    onStartNewSessionClick(socket)
+  );
 };
 
 const main = () => {
