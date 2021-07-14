@@ -27,7 +27,11 @@ test.describe("The room page", () => {
     await user1Page.goto(roomPage);
     await user2Page.goto(roomPage);
 
-    const notification = await user1Page.$("text=/User .* joined the room/");
+    const user2Id = await user2Page.evaluate(() => window.__userId__);
+
+    const notification = await user1Page.$(
+      `text=User ${user2Id} joined the room`
+    );
 
     expect(notification).not.toBeNull();
   });

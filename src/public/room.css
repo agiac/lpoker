@@ -1,15 +1,10 @@
 #layout {
   display: grid;
-  grid-template-rows: auto 1fr;
-  grid-template-columns: auto 1fr;
-  grid-template-areas:
-    "a a"
-    "b c";
+  grid-template-columns: 1fr auto;
   gap: 2rem;
 }
 
 #notifications {
-  grid-area: b;
   width: calc(max(200px, 25vw));
 }
 
@@ -35,8 +30,4 @@
 
 .notificaiton {
   color: lightslategray;
-}
-
-main {
-  grid-area: c;
 }

@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const { nanoid } = require("nanoid");
+const { humanId } = require("human-id");
 
 const router = Router();
 
@@ -19,8 +20,9 @@ router.get("/", (req, res) => {
 
 router.get("/rooms/:roomId", (req, res) => {
   const { roomId } = req.params;
+  const userId = humanId("-");
 
-  res.render("room", { roomId });
+  res.render("room", { roomId, userId });
 });
 
 exports.router = router;
