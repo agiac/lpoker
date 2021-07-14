@@ -7,14 +7,6 @@ test.describe("The room page", () => {
 
   const roomPage = `http://localhost:${process.env.SERVER_PORT}/rooms/${roomId}`;
 
-  test("should display the room ID", async ({ page }) => {
-    await page.goto(roomPage);
-
-    const roomName = await page.$(`text=Room: ${roomId}`);
-
-    expect(roomName).not.toBeNull();
-  });
-
   test("when a new user joins a room, the other participants should be notified", async ({
     browser,
   }) => {
@@ -27,6 +19,8 @@ test.describe("The room page", () => {
     await user1Page.goto(roomPage);
     await user2Page.goto(roomPage);
 
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
     const user2Id = await user2Page.evaluate(() => window.__userId__);
 
     const notification = await user1Page.$(
@@ -50,6 +44,8 @@ test.describe("The room page", () => {
       `http://localhost:${process.env.SERVER_PORT}/rooms/other-room`
     );
 
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
     const user2Id = await user2Page.evaluate(() => window.__userId__);
 
     const notification = await user1Page.$(
@@ -71,6 +67,8 @@ test.describe("The room page", () => {
     await user1Page.goto(roomPage);
     await user2Page.goto(roomPage);
 
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
     const user2Id = await user2Page.evaluate(() => window.__userId__);
 
     await user2Page.click("text='8'");
@@ -93,7 +91,11 @@ test.describe("The room page", () => {
     await user1Page.goto(roomPage);
     await user2Page.goto(roomPage);
 
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
     const user1Id = await user1Page.evaluate(() => window.__userId__);
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
     const user2Id = await user2Page.evaluate(() => window.__userId__);
 
     await user1Page.click("text='5'");
@@ -104,14 +106,49 @@ test.describe("The room page", () => {
 
     await user1Page.click("text=Show results");
 
-    const voteUser1Page1 = await user1Page.$(`text=${user1Id}: 5`);
-    const voteUser2Page1 = await user1Page.$(`text=${user2Id}: 8`);
-    const voteUser1Page2 = await user2Page.$(`text=${user1Id}: 5`);
-    const voteUser2Page2 = await user2Page.$(`text=${user2Id}: 8`);
+    expect(await user1Page.$(`text=${user1Id}: 5`)).not.toBeNull();
+    expect(await user1Page.$(`text=${user2Id}: 8`)).not.toBeNull();
+    expect(await user2Page.$(`text=${user1Id}: 5`)).not.toBeNull();
+    expect(await user2Page.$(`text=${user2Id}: 8`)).not.toBeNull();
+  });
 
-    expect(voteUser1Page1).not.toBeNull();
-    expect(voteUser2Page1).not.toBeNull();
-    expect(voteUser1Page2).not.toBeNull();
-    expect(voteUser2Page2).not.toBeNull();
+  test("when the 'Start new session' button is clicked, the votes are cleared", async ({
+    browser,
+  }) => {
+    const user1Context = await browser.newContext();
+    const user2Context = await browser.newContext();
+
+    const user1Page = await user1Context.newPage();
+    const user2Page = await user2Context.newPage();
+
+    await user1Page.goto(roomPage);
+    await user2Page.goto(roomPage);
+
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    const user1Id = await user1Page.evaluate(() => window.__userId__);
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    const user2Id = await user2Page.evaluate(() => window.__userId__);
+
+    await user1Page.click("text='5'");
+    await user1Page.click("text=Submit");
+
+    await user2Page.click("text='8'");
+    await user2Page.click("text=Submit");
+
+    await user1Page.click("text=Show results");
+
+    expect(await user1Page.$(`text=${user1Id}: 5`)).not.toBeNull();
+    expect(await user1Page.$(`text=${user2Id}: 8`)).not.toBeNull();
+    expect(await user2Page.$(`text=${user1Id}: 5`)).not.toBeNull();
+    expect(await user2Page.$(`text=${user2Id}: 8`)).not.toBeNull();
+
+    await user1Page.click("text=Start new session");
+
+    expect(await user1Page.$(`text=${user1Id}: 5`)).toBeNull();
+    expect(await user1Page.$(`text=${user2Id}: 8`)).toBeNull();
+    expect(await user2Page.$(`text=${user1Id}: 5`)).toBeNull();
+    expect(await user2Page.$(`text=${user2Id}: 8`)).toBeNull();
   });
 });

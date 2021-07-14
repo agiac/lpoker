@@ -56,7 +56,13 @@ const onShowResults = (data) => {
   broadcastAll(roomId, {
     event: "show-results",
     data: {
-      votes: votes[roomId],
+      votes: Object.entries(votes[roomId]).reduce(
+        (previous, [userId, vote]) =>
+          typeof vote === "string" && vote !== ""
+            ? { ...previous, [userId]: vote }
+            : previous,
+        {}
+      ),
     },
   });
 };
