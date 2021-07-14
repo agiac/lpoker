@@ -24,6 +24,11 @@ const onNewMember = (data) => {
   sendNotification(`User ${data.userId} joined the room`);
 };
 
+const onVote = (data) => {
+  console.log("Voted", data);
+  sendNotification(`User ${data.userId} just voted`);
+};
+
 const createWebSocketConnection = () => {
   const socket = new WebSocket("ws://localhost:3000");
 
@@ -42,26 +47,51 @@ const createWebSocketConnection = () => {
   socket.addEventListener("message", (event) => {
     const message = JSON.parse(event.data);
 
-    if (message.event === "new-member") {
-      onNewMember(message.data);
+    console.log(message);
+
+    switch (message.event) {
+      case "new-member":
+        onNewMember(message.data);
+        break;
+
+      case "voted":
+        onVote(message.data);
+        break;
+
+      default:
+        break;
     }
   });
+
+  return socket;
 };
 
-const onVoteSubmit = (e) => {
+const onVoteSubmit = (socket) => (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
-  console.log(Array.from(formData.values()));
+
+  const vote = formData.get("vote");
+
+  socket.send(
+    JSON.stringify({
+      event: "vote",
+      data: {
+        userId,
+        roomId,
+        vote,
+      },
+    })
+  );
 };
 
-const addEventListeners = () => {
+const addEventListeners = (socket) => {
   const votingForm = document.getElementById("voting-form");
-  votingForm.addEventListener("submit", onVoteSubmit);
+  votingForm.addEventListener("submit", onVoteSubmit(socket));
 };
 
 const main = () => {
-  createWebSocketConnection();
-  addEventListeners();
+  const socket = createWebSocketConnection();
+  addEventListeners(socket);
 };
 
 main();

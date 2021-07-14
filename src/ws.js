@@ -4,6 +4,46 @@ const clients = new Map();
 
 const votes = {};
 
+const broadcast = (senderId, roomId, event) => {
+  Object.keys(votes[roomId]).forEach((client) => {
+    if (client !== senderId) {
+      clients.get(client).send(JSON.stringify(event));
+    }
+  });
+};
+
+const onConnected = (ws, data) => {
+  const { roomId, userId } = data;
+
+  if (!(roomId in votes)) {
+    votes[roomId] = { [userId]: "" };
+  } else {
+    votes[roomId][userId] = "";
+  }
+
+  clients.set(userId, ws);
+
+  broadcast(userId, roomId, {
+    event: "new-member",
+    data: {
+      userId,
+    },
+  });
+};
+
+const onVote = (data) => {
+  const { roomId, userId, vote } = data;
+
+  votes[roomId][userId] = vote;
+
+  broadcast(userId, roomId, {
+    event: "voted",
+    data: {
+      userId,
+    },
+  });
+};
+
 const createWebSocketServer = (httpServer) => {
   const wss = new WebSocket.Server({ server: httpServer });
 
@@ -11,30 +51,17 @@ const createWebSocketServer = (httpServer) => {
     ws.on("message", (message) => {
       const { event, data } = JSON.parse(message.toString());
 
-      if (event === "connected") {
-        const { roomId, userId } = data;
+      switch (event) {
+        case "connected":
+          onConnected(ws, data);
+          break;
 
-        if (!(roomId in votes)) {
-          votes[roomId] = { [userId]: "" };
-        } else {
-          votes[roomId][userId] = "";
-        }
+        case "vote":
+          onVote(data);
+          break;
 
-        clients.set(userId, ws);
-
-        Object.keys(votes[roomId]).forEach((client) => {
-          if (client !== userId) {
-            const clientSocket = clients.get(client);
-            clientSocket.send(
-              JSON.stringify({
-                event: "new-member",
-                data: {
-                  userId,
-                },
-              })
-            );
-          }
-        });
+        default:
+          break;
       }
     });
   });

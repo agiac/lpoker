@@ -35,4 +35,49 @@ test.describe("The room page", () => {
 
     expect(notification).not.toBeNull();
   });
+
+  test("when a new user joins a room, the participants in the other room should not be notified", async ({
+    browser,
+  }) => {
+    const user1Context = await browser.newContext();
+    const user2Context = await browser.newContext();
+
+    const user1Page = await user1Context.newPage();
+    const user2Page = await user2Context.newPage();
+
+    await user1Page.goto(roomPage);
+    await user2Page.goto(
+      `http://localhost:${process.env.SERVER_PORT}/rooms/other-room`
+    );
+
+    const user2Id = await user2Page.evaluate(() => window.__userId__);
+
+    const notification = await user1Page.$(
+      `text=User ${user2Id} joined the room`
+    );
+
+    expect(notification).toBeNull();
+  });
+
+  test("when a new user votes, the other participants should be notified", async ({
+    browser,
+  }) => {
+    const user1Context = await browser.newContext();
+    const user2Context = await browser.newContext();
+
+    const user1Page = await user1Context.newPage();
+    const user2Page = await user2Context.newPage();
+
+    await user1Page.goto(roomPage);
+    await user2Page.goto(roomPage);
+
+    const user2Id = await user2Page.evaluate(() => window.__userId__);
+
+    await user2Page.click("text='8'");
+    await user2Page.click("text=Submit");
+
+    const notification = await user1Page.$(`text=User ${user2Id} just voted`);
+
+    expect(notification).not.toBeNull();
+  });
 });
