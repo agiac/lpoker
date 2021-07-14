@@ -72,7 +72,7 @@ const createWebSocketConnection = () => {
   socket.addEventListener("message", (rawEvent) => {
     const { event, data } = JSON.parse(rawEvent.data);
 
-    console.log({ event, data });
+    // console.log({ event, data });
 
     switch (event) {
       case "new-member":

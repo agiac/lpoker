@@ -111,8 +111,8 @@ const createWebSocketServer = (httpServer) => {
       });
 
       Object.keys(votes).forEach((roomId) => {
-        if (votes[roomId][toRemove]) {
-          votes[roomId][toRemove] = undefined;
+        if (typeof votes[roomId][toRemove] !== "undefined") {
+          delete votes[roomId][toRemove];
         }
       });
     });
