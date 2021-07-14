@@ -78,6 +78,31 @@ const onNewSession = (data) => {
   votes[roomId] = {};
 };
 
+const onClose = (ws) => {
+  let disconnectedUser;
+  let roomLeft;
+
+  clients.forEach((socket, userId) => {
+    if (Object.is(ws, socket)) {
+      disconnectedUser = userId;
+    }
+  });
+
+  Object.keys(votes).forEach((roomId) => {
+    if (typeof votes[roomId][disconnectedUser] !== "undefined") {
+      roomLeft = roomId;
+      delete votes[roomId][disconnectedUser];
+    }
+  });
+
+  broadcast(disconnectedUser, roomLeft, {
+    event: "exit",
+    data: {
+      userId: disconnectedUser,
+    },
+  });
+};
+
 const createWebSocketServer = (httpServer) => {
   const wss = new WebSocket.Server({ server: httpServer });
 
@@ -107,21 +132,7 @@ const createWebSocketServer = (httpServer) => {
       }
     });
 
-    ws.on("close", () => {
-      let toRemove;
-
-      clients.forEach((socket, userId) => {
-        if (Object.is(ws, socket)) {
-          toRemove = userId;
-        }
-      });
-
-      Object.keys(votes).forEach((roomId) => {
-        if (typeof votes[roomId][toRemove] !== "undefined") {
-          delete votes[roomId][toRemove];
-        }
-      });
-    });
+    ws.on("close", () => onClose(ws));
   });
 };
 

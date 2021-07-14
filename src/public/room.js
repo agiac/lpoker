@@ -54,6 +54,10 @@ const onNewSession = () => {
   clearResults(resultsList);
 };
 
+const onExit = (data) => {
+  sendNotification(`User ${data.userId} left the room`);
+};
+
 const createWebSocketConnection = () => {
   const socket = new WebSocket("ws://localhost:3000");
 
@@ -89,6 +93,10 @@ const createWebSocketConnection = () => {
 
       case "new-session":
         onNewSession();
+        break;
+
+      case "exit":
+        onExit(data);
         break;
 
       default:

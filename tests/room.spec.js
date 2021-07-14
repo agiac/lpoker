@@ -30,6 +30,31 @@ test.describe("The room page", () => {
     expect(notification).not.toBeNull();
   });
 
+  test("when a user leaves a room, the other participants should be notified", async ({
+    browser,
+  }) => {
+    const user1Context = await browser.newContext();
+    const user2Context = await browser.newContext();
+
+    const user1Page = await user1Context.newPage();
+    const user2Page = await user2Context.newPage();
+
+    await user1Page.goto(roomPage);
+    await user2Page.goto(roomPage);
+
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    const user2Id = await user2Page.evaluate(() => window.__userId__);
+
+    await user2Page.reload();
+
+    const notification = await user1Page.$(
+      `text=User ${user2Id} left the room`
+    );
+
+    expect(notification).not.toBeNull();
+  });
+
   test("when a new user joins a room, the participants in the other room should not be notified", async ({
     browser,
   }) => {
@@ -55,7 +80,7 @@ test.describe("The room page", () => {
     expect(notification).toBeNull();
   });
 
-  test("when a new user votes, the other participants should be notified", async ({
+  test("when a user votes, the other participants should be notified", async ({
     browser,
   }) => {
     const user1Context = await browser.newContext();
@@ -79,7 +104,7 @@ test.describe("The room page", () => {
     expect(notification).not.toBeNull();
   });
 
-  test("when the 'Show results' button is clicked, all the votes are displayed", async ({
+  test("when the 'Show results' button is clicked, all the votes should be displayed", async ({
     browser,
   }) => {
     const user1Context = await browser.newContext();
@@ -112,7 +137,7 @@ test.describe("The room page", () => {
     expect(await user2Page.$(`text=${user2Id}: 8`)).not.toBeNull();
   });
 
-  test("when the 'Start new session' button is clicked, the votes are cleared", async ({
+  test("when the 'Start new session' button is clicked, the votes should be cleared", async ({
     browser,
   }) => {
     const user1Context = await browser.newContext();
