@@ -103,34 +103,36 @@ const onClose = (ws) => {
   });
 };
 
+const onMessage = (ws, message) => {
+  const { event, data } = JSON.parse(message.toString());
+
+  switch (event) {
+    case "connected":
+      onConnected(ws, data);
+      break;
+
+    case "vote":
+      onVote(data);
+      break;
+
+    case "show-results":
+      onShowResults(data);
+      break;
+
+    case "new-session":
+      onNewSession(data);
+      break;
+
+    default:
+      break;
+  }
+};
+
 const createWebSocketServer = (httpServer) => {
   const wss = new WebSocket.Server({ server: httpServer });
 
   wss.on("connection", (ws) => {
-    ws.on("message", (message) => {
-      const { event, data } = JSON.parse(message.toString());
-
-      switch (event) {
-        case "connected":
-          onConnected(ws, data);
-          break;
-
-        case "vote":
-          onVote(data);
-          break;
-
-        case "show-results":
-          onShowResults(data);
-          break;
-
-        case "new-session":
-          onNewSession(data);
-          break;
-
-        default:
-          break;
-      }
-    });
+    ws.on("message", (message) => onMessage(ws, message));
 
     ws.on("close", () => onClose(ws));
   });
