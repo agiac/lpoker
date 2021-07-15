@@ -1,31 +1,9 @@
+import { sendNotification } from "./sendNotificaiton.js";
+import { clearResultsList } from "./clearResultsList.js";
+
 // @ts-ignore
 // eslint-disable-next-line no-underscore-dangle
 const { __userId__: userId } = window;
-
-const getResultsList = () => document.getElementById("results-list");
-
-const clearResultsList = (resultsList) => {
-  while (resultsList.children.length > 0) {
-    resultsList.removeChild(resultsList.lastChild);
-  }
-};
-
-const sendNotification = (message) => {
-  const notificationList = document.getElementById("notifications-list");
-
-  const notification = document.createElement("li");
-  notification.textContent = message;
-
-  if (notificationList.children.length === 0) {
-    notificationList.appendChild(notification);
-  } else {
-    notificationList.prepend(notification);
-  }
-
-  if (notificationList.children.length >= 10) {
-    notificationList.removeChild(notificationList.lastChild);
-  }
-};
 
 const onWelcome = (data) => {
   const { members } = data;
@@ -64,9 +42,7 @@ const onVoted = (data) => {
 const onShowResults = (data) => {
   const { votes } = data;
 
-  const resultsList = getResultsList();
-
-  clearResultsList(resultsList);
+  const resultsList = clearResultsList();
 
   Object.entries(votes).forEach(([user, vote]) => {
     const voteItem = document.createElement("li");
@@ -76,9 +52,7 @@ const onShowResults = (data) => {
 };
 
 const onNewSession = () => {
-  const resultsList = getResultsList();
-
-  clearResultsList(resultsList);
+  clearResultsList();
 };
 
 const onExit = (data) => {

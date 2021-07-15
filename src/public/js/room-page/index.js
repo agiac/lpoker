@@ -1,8 +1,5 @@
-// eslint-disable-next-line import/extensions
 import { WSClient } from "./WSClient.js";
-// eslint-disable-next-line import/extensions
 import { setWSEventListeners } from "./setWSEventListeners.js";
-// eslint-disable-next-line import/extensions
 import { setDOMEventListeners } from "./setDOMEventListeners.js";
 
 // @ts-ignore
