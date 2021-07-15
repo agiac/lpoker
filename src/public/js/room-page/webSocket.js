@@ -130,7 +130,11 @@ const onMessage = (rawEvent) => {
 };
 
 export const createWebSocketConnection = () => {
-  const socket = new WebSocket("ws://localhost:3000");
+  const socket = new WebSocket(
+    `${window.location.protocol === "https:" ? "wss" : "ws"}://${
+      window.location.hostname
+    }:3000`
+  );
 
   socket.addEventListener("open", () => onOpen(socket));
 
