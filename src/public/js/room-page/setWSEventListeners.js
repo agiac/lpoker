@@ -1,8 +1,10 @@
 // @ts-ignore
 // eslint-disable-next-line no-underscore-dangle
-const { __userId__: userId, __roomId__: roomId } = window;
+const { __userId__: userId } = window;
 
-const clearResults = (resultsList) => {
+const getResultsList = () => document.getElementById("results-list");
+
+const clearResultsList = (resultsList) => {
   while (resultsList.children.length > 0) {
     resultsList.removeChild(resultsList.lastChild);
   }
@@ -55,92 +57,49 @@ const onNewMember = (data) => {
   sendNotification(`User ${data.userId} joined the room`);
 };
 
-const onVote = (data) => {
+const onVoted = (data) => {
   sendNotification(`User ${data.userId} just voted`);
 };
 
 const onShowResults = (data) => {
   const { votes } = data;
 
-  const resultsList = document.getElementById("results-list");
+  const resultsList = getResultsList();
 
-  clearResults(resultsList);
+  clearResultsList(resultsList);
 
   Object.entries(votes).forEach(([user, vote]) => {
     const voteItem = document.createElement("li");
     voteItem.textContent = `${user}: ${vote}`;
-
     resultsList.appendChild(voteItem);
   });
 };
 
 const onNewSession = () => {
-  const resultsList = document.getElementById("results-list");
+  const resultsList = getResultsList();
 
-  clearResults(resultsList);
+  clearResultsList(resultsList);
 };
 
 const onExit = (data) => {
   sendNotification(`User ${data.userId} left the room`);
 };
 
-const onOpen = (socket) => {
-  socket.send(
-    JSON.stringify({
-      event: "connected",
-      data: {
-        roomId,
-        userId,
-      },
-    })
-  );
+/**
+ * @param {import("./WSClient.js").WSClient} wsClient
+ */
+export const setWSEventListeners = (wsClient) => {
+  wsClient.on("welcome", onWelcome);
+
+  wsClient.on("new-member", onNewMember);
+
+  wsClient.on("voted", onVoted);
+
+  wsClient.on("show-results", onShowResults);
+
+  wsClient.on("new-session", onNewSession);
+
+  wsClient.on("exit", onExit);
 };
 
-const onMessage = (rawEvent) => {
-  const { event, data } = JSON.parse(rawEvent.data);
-
-  switch (event) {
-    case "welcome":
-      onWelcome(data);
-      break;
-
-    case "new-member":
-      onNewMember(data);
-      break;
-
-    case "voted":
-      onVote(data);
-      break;
-
-    case "show-results":
-      onShowResults(data);
-      break;
-
-    case "new-session":
-      onNewSession();
-      break;
-
-    case "exit":
-      onExit(data);
-      break;
-
-    default:
-      break;
-  }
-};
-
-export const createWebSocketConnection = () => {
-  const socket = new WebSocket(
-    `${window.location.protocol === "https:" ? "wss" : "ws"}://${
-      window.location.host
-    }`
-  );
-
-  socket.addEventListener("open", () => onOpen(socket));
-
-  socket.addEventListener("message", onMessage);
-
-  return socket;
-};
-
-export default createWebSocketConnection;
+export default setWSEventListeners;

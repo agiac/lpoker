@@ -7,8 +7,18 @@ test.describe("The room page", () => {
 
   const roomPage = `http://localhost:3000/rooms/${roomId}`;
 
-  test("when a user joins a room, he should receive a welcome notification", async () => {
-    test.skip();
+  test("when a user joins a room, he should receive a welcome notification", async ({
+    browser,
+  }) => {
+    const userContext = await browser.newContext();
+
+    const userPage = await userContext.newPage();
+
+    await userPage.goto(roomPage);
+
+    const welcomeMessage = await userPage.$("text=/Welcome .*!/");
+
+    expect(welcomeMessage).not.toBeNull();
   });
 
   test("when a new user joins a room, the other participants should be notified", async ({

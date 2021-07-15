@@ -9,17 +9,21 @@ const sendMessage = (receiverId, event) => {
 };
 
 const broadcastAll = (roomId, event) => {
-  Object.keys(votes[roomId]).forEach((client) => {
-    clients.get(client).send(JSON.stringify(event));
-  });
+  if (votes[roomId]) {
+    Object.keys(votes[roomId]).forEach((client) => {
+      clients.get(client).send(JSON.stringify(event));
+    });
+  }
 };
 
 const broadcast = (senderId, roomId, event) => {
-  Object.keys(votes[roomId]).forEach((client) => {
-    if (client !== senderId) {
-      clients.get(client).send(JSON.stringify(event));
-    }
-  });
+  if (votes[roomId]) {
+    Object.keys(votes[roomId]).forEach((client) => {
+      if (client !== senderId) {
+        clients.get(client).send(JSON.stringify(event));
+      }
+    });
+  }
 };
 
 const onConnected = (ws, data) => {
