@@ -1,23 +1,19 @@
-const { test, expect } = require("@playwright/test");
+const { test } = require("@playwright/test");
+
+const { nanoid } = require("nanoid");
 
 test.describe("The home page", () => {
   const homePage = `http://localhost:${process.env.SERVER_PORT}`;
 
-  test("should display the app name", async ({ page }) => {
+  test("should redirect to the desired room", async ({ page }) => {
+    const roomId = nanoid();
+
     await page.goto(homePage);
 
-    const title = await page.$("text=LPoker");
+    await page.fill("input", roomId);
 
-    expect(title).not.toBeNull();
-  });
+    await page.click('button:has-text("JOIN")');
 
-  test("should allow to create and join a new room", async ({ page }) => {
-    await page.goto(homePage);
-
-    await page.click("text=Create new room");
-
-    await page.click("text=Room created: follow me");
-
-    await page.waitForURL(`${homePage}/rooms/**`);
+    await page.waitForURL(`${homePage}/rooms/${roomId}`);
   });
 });

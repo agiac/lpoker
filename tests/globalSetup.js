@@ -8,6 +8,7 @@ module.exports = async () => {
   await new Promise((done) => server.listen(done));
 
   // Expose port to the tests.
+  // @ts-ignore
   process.env.SERVER_PORT = String(server.address().port);
 
   // Return the teardown function.

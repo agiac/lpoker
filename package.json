@@ -7,9 +7,9 @@
     "start": "node  src/main.js",
     "dev": "nodemon src/main.js",
     "test": "playwright test",
-    "lint": "eslint src/** tests/**",
+    "lint": "eslint src/**/*.js tests/**/*.js",
     "lint:fix": "npm run lint -- --fix",
-    "format": "prettier --write src/** tests/**",
+    "format": "prettier --write src/**/*.{js,css,html} tests/**/*.{js,css,html}",
     "fix": "npm run format && npm run lint:fix"
   },
   "author": "",

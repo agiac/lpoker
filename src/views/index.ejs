@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/global.css">
-    <link rel="stylesheet" href="/homePage.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/home-page.css" />
   </head>
   <body>
-    <h1>LPoker</h1>
+    <header>
+      <h1>LPoker</h1>
+    </header>
     <main>
-    <% if (!roomId) { %>
-      <form method="POST" action="/create-room">
-        <button class="button" type="submit">Create new room</button>
+      <form method="GET" action="/join-room">
+        <fieldset>
+          <legend>Join room</legend>
+          <input name="room" />
+          <button type="submit">JOIN</button>
+        </fieldset>
       </form>
-    <% } %>
-    <% if (roomId) { %>
-      <a class="button confirm" href="/rooms/<%=roomId%>">Room created: follow me</a>
-    <% } %>
     </main>
   </body>
 </html>
