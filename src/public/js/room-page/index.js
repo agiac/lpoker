@@ -1,6 +1,6 @@
 /* eslint-disable import/extensions */
-import { createWebSocketConnection } from "./room-ws.js";
-import { addEventListeners } from "./room-events-listeners.js";
+import { createWebSocketConnection } from "./webSocket.js";
+import { addEventListeners } from "./eventListeners.js";
 
 const main = () => {
   addEventListeners(createWebSocketConnection());

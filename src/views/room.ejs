@@ -3,8 +3,8 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LPoker tool</title>
-    <link rel="stylesheet" href="/global.css" />
-    <link rel="stylesheet" href="/room.css" />
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/room-page.css" />
   </head>
   <body>
     <header>
@@ -72,11 +72,10 @@
         </aside>
       </div>
     </main>
-
     <script>
       window.__roomId__ = "<%=roomId%>";
       window.__userId__ = "<%=userId%>";
     </script>
-    <script src="/room.js" type="module"></script>
+    <script src="/js/room-page/index.js" type="module"></script>
   </body>
 </html>

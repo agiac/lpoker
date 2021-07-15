@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const { nanoid } = require("nanoid");
+// eslint-disable-next-line import/no-unresolved
 const { humanId } = require("human-id");
 
 const router = Router();
