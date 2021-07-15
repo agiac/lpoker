@@ -4,7 +4,7 @@ const clients = new Map();
 
 const votes = {};
 
-const message = (receiverId, event) => {
+const sendMessage = (receiverId, event) => {
   clients.get(receiverId).send(JSON.stringify(event));
 };
 
@@ -33,7 +33,7 @@ const onConnected = (ws, data) => {
 
   clients.set(userId, ws);
 
-  message(userId, {
+  sendMessage(userId, {
     event: "welcome",
     data: {
       members: Object.keys(votes[roomId]).filter((member) => member !== userId),
