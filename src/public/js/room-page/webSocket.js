@@ -20,9 +20,35 @@ const sendNotification = (message) => {
     notificationList.prepend(notification);
   }
 
-  if (notificationList.children.length > 10) {
+  if (notificationList.children.length >= 10) {
     notificationList.removeChild(notificationList.lastChild);
   }
+};
+
+const onWelcome = (data) => {
+  const { members } = data;
+
+  if (members.length === 0) {
+    sendNotification(
+      `Welcome ${userId}! There are no other members in this room at the moment`
+    );
+    return;
+  }
+
+  if (members.length === 1) {
+    sendNotification(
+      `Welcome ${userId}! There is another member in this room at the moment: ${members[0]}`
+    );
+    return;
+  }
+
+  sendNotification(
+    `Welcome ${userId}! There are ${
+      members.length
+    } other members in this room at the moment: ${members
+      .slice(0, members.length - 1)
+      .join(", ")} and ${members[members.length - 1]}`
+  );
 };
 
 const onNewMember = (data) => {
@@ -74,6 +100,10 @@ const onMessage = (rawEvent) => {
   const { event, data } = JSON.parse(rawEvent.data);
 
   switch (event) {
+    case "welcome":
+      onWelcome(data);
+      break;
+
     case "new-member":
       onNewMember(data);
       break;

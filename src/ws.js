@@ -4,6 +4,10 @@ const clients = new Map();
 
 const votes = {};
 
+const message = (receiverId, event) => {
+  clients.get(receiverId).send(JSON.stringify(event));
+};
+
 const broadcastAll = (roomId, event) => {
   Object.keys(votes[roomId]).forEach((client) => {
     clients.get(client).send(JSON.stringify(event));
@@ -28,6 +32,13 @@ const onConnected = (ws, data) => {
   }
 
   clients.set(userId, ws);
+
+  message(userId, {
+    event: "welcome",
+    data: {
+      members: Object.keys(votes[roomId]).filter((member) => member !== userId),
+    },
+  });
 
   broadcast(userId, roomId, {
     event: "new-member",

@@ -7,6 +7,10 @@ test.describe("The room page", () => {
 
   const roomPage = `http://localhost:${process.env.SERVER_PORT}/rooms/${roomId}`;
 
+  test("when a user joins a room, he should receive a welcome notification", async () => {
+    test.skip();
+  });
+
   test("when a new user joins a room, the other participants should be notified", async ({
     browser,
   }) => {
