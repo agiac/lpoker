@@ -5,7 +5,7 @@ const { test, expect } = require("@playwright/test");
 test.describe("The room page", () => {
   const roomId = nanoid(6);
 
-  const roomPage = `http://localhost:${process.env.SERVER_PORT}/rooms/${roomId}`;
+  const roomPage = `http://localhost:3000/rooms/${roomId}`;
 
   test("when a user joins a room, he should receive a welcome notification", async () => {
     test.skip();
@@ -69,9 +69,7 @@ test.describe("The room page", () => {
     const user2Page = await user2Context.newPage();
 
     await user1Page.goto(roomPage);
-    await user2Page.goto(
-      `http://localhost:${process.env.SERVER_PORT}/rooms/other-room`
-    );
+    await user2Page.goto(`http://localhost:3000/rooms/other-room`);
 
     // @ts-ignore
     // eslint-disable-next-line no-underscore-dangle
