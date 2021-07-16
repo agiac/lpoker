@@ -1,3 +1,3 @@
 # LPoker
 
-A simple pocker tool.
+A simple pocker planning tool.
