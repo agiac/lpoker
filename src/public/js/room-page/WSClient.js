@@ -10,12 +10,12 @@ export class WSClient {
   #socket;
 
   /**
-   * @type {(sendEvent: (event: string, data: Object) => void) => void}
+   * @type {() => void}
    */
   #onOpen;
 
   /**
-   * @type {Map<string, (data: Object, sendEvent: (event: string, data: Object) => void) => void>}
+   * @type {Map<string, (data: Object) => void>}
    */
   #listeners;
 
@@ -26,7 +26,7 @@ export class WSClient {
 
   /**
    * @param {string} connectionString
-   * @param {(sendEvent: (event: string, data: Object) => void) => void} onOpen
+   * @param {() => void} onOpen
    */
   constructor(connectionString, onOpen) {
     this.#connectionString = connectionString;
@@ -40,15 +40,22 @@ export class WSClient {
     this.#socket = new WebSocket(this.#connectionString);
 
     this.#socket.addEventListener("open", () => {
+      console.log(`Connection with ${this.#connectionString} open`);
       this.#reconnectionDelay = 1000;
-      this.#onOpen(this.sendEvent.bind(this));
+      this.#onOpen();
     });
 
-    this.#socket.addEventListener("error", () => {
+    this.#socket.addEventListener("error", (e) => {
+      console.error(e);
       this.#socket.close();
     });
 
     this.#socket.addEventListener("close", () => {
+      console.log(
+        `Connection close. Attempting to reconnect in ${
+          this.#reconnectionDelay / 1000
+        } seconds`
+      );
       setTimeout(() => {
         this.#connect();
       }, this.#reconnectionDelay);
@@ -61,14 +68,14 @@ export class WSClient {
       const listener = this.#listeners.get(event);
 
       if (listener) {
-        listener(data, this.sendEvent.bind(this));
+        listener(data);
       }
     });
   }
 
   /**
    * @param {string} event
-   * @param {(data: Object, sendEvent: (event: string, data: Object) => void) => void} cb
+   * @param {(data: Object) => void} cb
    */
   on(event, cb) {
     this.#listeners.set(event, cb);
