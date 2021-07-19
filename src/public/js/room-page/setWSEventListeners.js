@@ -5,38 +5,42 @@ import { clearResultsList } from "./clearResultsList.js";
 // eslint-disable-next-line no-underscore-dangle
 const { __userId__: userId } = window;
 
-const onWelcome = (data) => {
-  const { members } = data;
-
-  if (members.length === 0) {
-    sendNotification(
-      `Welcome ${userId}! There are no other members in this room at the moment`
-    );
-    return;
-  }
-
-  if (members.length === 1) {
-    sendNotification(
-      `Welcome ${userId}! There is another member in this room at the moment: ${members[0]}`
-    );
-    return;
-  }
-
-  sendNotification(
-    `Welcome ${userId}! There are ${
-      members.length
-    } other members in this room at the moment: ${members
-      .slice(0, members.length - 1)
-      .join(", ")} and ${members[members.length - 1]}`
-  );
-};
-
 const onNewMember = (data) => {
-  sendNotification(`User ${data.userId} joined the room`);
+  if (data.userId === userId) {
+    const { members } = data;
+
+    if (members.length === 0) {
+      sendNotification(
+        `Welcome ${userId}! There are no other members in this room at the moment`
+      );
+      return;
+    }
+
+    if (members.length === 1) {
+      sendNotification(
+        `Welcome ${userId}! There is another member in this room at the moment: ${members[0]}`
+      );
+      return;
+    }
+
+    sendNotification(
+      `Welcome ${userId}! There are ${
+        members.length
+      } other members in this room at the moment: ${members
+        .slice(0, members.length - 1)
+        .join(", ")} and ${members[members.length - 1]}`
+    );
+  } else {
+    sendNotification(`User ${data.userId} joined the room`);
+  }
 };
 
 const onVoted = (data) => {
-  sendNotification(`User ${data.userId} just voted`);
+  if (data.userId === userId) {
+    //
+  } else {
+    sendNotification(`User ${data.userId} just voted`);
+  }
 };
 
 const onShowResults = (data) => {
@@ -63,8 +67,6 @@ const onExit = (data) => {
  * @param {import("./WSClient.js").WSClient} wsClient
  */
 export const setWSEventListeners = (wsClient) => {
-  wsClient.on("welcome", onWelcome);
-
   wsClient.on("new-member", onNewMember);
 
   wsClient.on("voted", onVoted);

@@ -26,6 +26,7 @@ const onShowResultsClick = (wsClient) => (e) => {
 
   wsClient.sendEvent("show-results", {
     roomId,
+    userId,
   });
 };
 
@@ -37,6 +38,7 @@ const onStartNewSessionClick = (wsClient) => (e) => {
 
   wsClient.sendEvent("new-session", {
     roomId,
+    userId,
   });
 };
 

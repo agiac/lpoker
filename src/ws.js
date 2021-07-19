@@ -4,24 +4,10 @@ const clients = new Map();
 
 const votes = {};
 
-const sendMessage = (receiverId, event) => {
-  clients.get(receiverId).send(JSON.stringify(event));
-};
-
-const broadcastAll = (roomId, event) => {
+const broadcast = (roomId, event) => {
   if (votes[roomId]) {
     Object.keys(votes[roomId]).forEach((client) => {
       clients.get(client).send(JSON.stringify(event));
-    });
-  }
-};
-
-const broadcast = (senderId, roomId, event) => {
-  if (votes[roomId]) {
-    Object.keys(votes[roomId]).forEach((client) => {
-      if (client !== senderId) {
-        clients.get(client).send(JSON.stringify(event));
-      }
     });
   }
 };
@@ -37,17 +23,11 @@ const onConnected = (ws, data) => {
 
   clients.set(userId, ws);
 
-  sendMessage(userId, {
-    event: "welcome",
-    data: {
-      members: Object.keys(votes[roomId]).filter((member) => member !== userId),
-    },
-  });
-
-  broadcast(userId, roomId, {
+  broadcast(roomId, {
     event: "new-member",
     data: {
       userId,
+      members: Object.keys(votes[roomId]).filter((member) => member !== userId),
     },
   });
 };
@@ -57,7 +37,7 @@ const onVote = (data) => {
 
   votes[roomId][userId] = vote;
 
-  broadcast(userId, roomId, {
+  broadcast(roomId, {
     event: "voted",
     data: {
       userId,
@@ -66,11 +46,12 @@ const onVote = (data) => {
 };
 
 const onShowResults = (data) => {
-  const { roomId } = data;
+  const { roomId, userId: requester } = data;
 
-  broadcastAll(roomId, {
+  broadcast(roomId, {
     event: "show-results",
     data: {
+      requester,
       votes: Object.entries(votes[roomId]).reduce(
         (previous, [userId, vote]) =>
           typeof vote === "string" && vote !== ""
@@ -83,11 +64,13 @@ const onShowResults = (data) => {
 };
 
 const onNewSession = (data) => {
-  const { roomId } = data;
+  const { roomId, userId: requester } = data;
 
-  broadcastAll(roomId, {
+  broadcast(roomId, {
     event: "new-session",
-    data: {},
+    data: {
+      requester,
+    },
   });
 
   votes[roomId] = {};
@@ -110,7 +93,7 @@ const onClose = (ws) => {
     }
   });
 
-  broadcast(disconnectedUser, roomLeft, {
+  broadcast(roomLeft, {
     event: "exit",
     data: {
       userId: disconnectedUser,
