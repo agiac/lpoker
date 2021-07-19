@@ -37,14 +37,20 @@ const onNewMember = (data) => {
 
 const onVoted = (data) => {
   if (data.userId === userId) {
-    //
+    sendNotification("Your vote has been received");
   } else {
     sendNotification(`User ${data.userId} just voted`);
   }
 };
 
 const onShowResults = (data) => {
-  const { votes } = data;
+  const { votes, requester } = data;
+
+  if (requester === userId) {
+    sendNotification("Your request has been received");
+  } else {
+    sendNotification(`User ${requester} requested to see the results`);
+  }
 
   const resultsList = clearResultsList();
 
@@ -55,7 +61,15 @@ const onShowResults = (data) => {
   });
 };
 
-const onNewSession = () => {
+const onNewSession = (data) => {
+  const { requester } = data;
+
+  if (requester === userId) {
+    sendNotification("Your request has been received");
+  } else {
+    sendNotification(`User ${requester} requested to start a new session`);
+  }
+
   clearResultsList();
 };
 
