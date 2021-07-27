@@ -9,6 +9,6 @@ module.exports = {
     requireConfigFile: false,
   },
   rules: {
-    "import/extensions": ["error", "always", { ignorePackages: true }],
+    "import/extensions": ["ignorePackages"],
   },
 };
