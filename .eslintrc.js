@@ -4,9 +4,9 @@ module.exports = {
     es2021: true,
   },
   extends: ["airbnb-base", "prettier"],
+  parser: "@babel/eslint-parser",
   parserOptions: {
-    ecmaVersion: 12,
-    sourceType: "module",
+    requireConfigFile: false,
   },
   rules: {
     "import/extensions": ["error", "always", { ignorePackages: true }],

@@ -40,17 +40,20 @@ export class WSClient {
     this.#socket = new WebSocket(this.#connectionString);
 
     this.#socket.addEventListener("open", () => {
+      // eslint-disable-next-line no-console
       console.log(`Connection with ${this.#connectionString} open`);
       this.#reconnectionDelay = 1000;
       this.#onOpen();
     });
 
     this.#socket.addEventListener("error", (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
       this.#socket.close();
     });
 
     this.#socket.addEventListener("close", () => {
+      // eslint-disable-next-line no-console
       console.log(
         `Connection close. Attempting to reconnect in ${
           this.#reconnectionDelay / 1000
@@ -94,3 +97,5 @@ export class WSClient {
     );
   }
 }
+
+export default WSClient;
