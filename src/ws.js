@@ -100,6 +100,35 @@ const onNewSession = ({ roomId, senderId }) => {
 };
 
 /**
+ * @type {EventHandler}
+ */
+const onCheat = ({ roomId, senderId }) => {
+  const cheaterClient = clients.get(senderId);
+
+  cheaterClient?.send(
+    JSON.stringify({
+      event: "cheat-results",
+      data: {
+        votes: Object.entries(votes[roomId]).reduce(
+          (previous, [userId, vote]) =>
+            typeof vote === "string" && vote !== "" && userId !== senderId
+              ? { ...previous, [userId]: vote }
+              : previous,
+          {}
+        ),
+      },
+    })
+  );
+
+  broadcast(roomId, {
+    event: "cheat",
+    data: {
+      cheater: senderId,
+    },
+  });
+};
+
+/**
  * @param {WebSocket} ws
  */
 const onClose = (ws) => {
@@ -154,6 +183,10 @@ const onMessage = (message, ws) => {
 
     case "new-session":
       onEvent(onNewSession);
+      break;
+
+    case "cheat":
+      onEvent(onCheat);
       break;
 
     default:

@@ -92,6 +92,40 @@ const onNewSession = (data) => {
 /**
  * @type {EventHandler}
  */
+const onCheat = (data) => {
+  const { cheater } = data;
+
+  if (cheater !== userId) {
+    sendNotification(`${cheater} just cheated 😔`);
+  }
+};
+
+/**
+ * @type {EventHandler}
+ */
+const onCheatResults = (data) => {
+  const { votes } = data;
+
+  if (Object.entries(votes).length === 0) {
+    sendNotification("No one else voted yet 😬");
+    return;
+  }
+
+  sendNotification("Hehe... 😉");
+
+  const resultsList = clearResultsList();
+
+  Object.entries(votes).forEach(([user, vote]) => {
+    if (user === userId) return;
+    const voteItem = document.createElement("li");
+    voteItem.textContent = `${user}: ${vote}`;
+    resultsList?.appendChild(voteItem);
+  });
+};
+
+/**
+ * @type {EventHandler}
+ */
 const onExit = (data) => {
   sendNotification(`User ${data.userId} left the room`);
 };
@@ -105,6 +139,8 @@ export const setWSEventListeners = (wsClient) => {
     .on("voted", onVoted)
     .on("show-results", onShowResults)
     .on("new-session", onNewSession)
+    .on("cheat", onCheat)
+    .on("cheat-results", onCheatResults)
     .on("exit", onExit);
 };
 

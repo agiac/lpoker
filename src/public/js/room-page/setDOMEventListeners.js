@@ -7,7 +7,7 @@
 /**
  * @type {EventHandlerCreator}
  */
-const makeOnVoteSubmit = (wsClient) => (e) => {
+const makeOnVoteFormSubmit = (wsClient) => (e) => {
   e.preventDefault();
   const formData = new FormData(/** @type {HTMLFormElement} */ (e.target));
 
@@ -21,7 +21,7 @@ const makeOnVoteSubmit = (wsClient) => (e) => {
 /**
  * @type {EventHandlerCreator}
  */
-const makeOnShowResultsClick = (wsClient) => (e) => {
+const makeOnShowResultsButtonClick = (wsClient) => (e) => {
   e.preventDefault();
 
   wsClient.sendEvent("show-results");
@@ -30,10 +30,19 @@ const makeOnShowResultsClick = (wsClient) => (e) => {
 /**
  * @type {EventHandlerCreator}
  */
-const makeOnStartNewSessionClick = (wsClient) => (e) => {
+const makeOnStartNewSessionButtonClick = (wsClient) => (e) => {
   e.preventDefault();
 
   wsClient.sendEvent("new-session");
+};
+
+/**
+ * @type {EventHandlerCreator}
+ */
+const makeOnCheatButtonClick = (wsClient) => (e) => {
+  e.preventDefault();
+
+  wsClient.sendEvent("cheat");
 };
 
 /**
@@ -41,16 +50,20 @@ const makeOnStartNewSessionClick = (wsClient) => (e) => {
  */
 export const setDOMEventListeners = (wsClient) => {
   document
-    .getElementById("voting-form-btn")
-    ?.addEventListener("submit", makeOnVoteSubmit(wsClient));
+    .getElementById("voting-form")
+    ?.addEventListener("submit", makeOnVoteFormSubmit(wsClient));
 
   document
     .getElementById("show-results-btn")
-    ?.addEventListener("click", makeOnShowResultsClick(wsClient));
+    ?.addEventListener("click", makeOnShowResultsButtonClick(wsClient));
 
   document
     .getElementById("start-new-session-btn")
-    ?.addEventListener("click", makeOnStartNewSessionClick(wsClient));
+    ?.addEventListener("click", makeOnStartNewSessionButtonClick(wsClient));
+
+  document
+    .getElementById("cheat-btn")
+    ?.addEventListener("click", makeOnCheatButtonClick(wsClient));
 };
 
 export default setDOMEventListeners;

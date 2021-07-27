@@ -177,9 +177,43 @@ test.describe("The room page", () => {
     const cheatButton = await page.$('text="Cheat"');
 
     const isDisabled = await cheatButton.evaluate(
-      (element) => element.getAttribute("disabled").toLowerCase() === "true"
+      (element) => element.getAttribute("disabled") !== null
     );
 
     expect(isDisabled).toBeTruthy();
+  });
+
+  test("it should show the results only to the user who clicked the 'Cheat' button and the other users should be notified", async ({
+    browser,
+  }) => {
+    const user1Context = await browser.newContext();
+    const user2Context = await browser.newContext();
+
+    const user1Page = await user1Context.newPage();
+    const user2Page = await user2Context.newPage();
+
+    await user1Page.goto(roomPage);
+    await user2Page.goto(roomPage);
+
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    const user1Id = await user1Page.evaluate(() => window.__userId__);
+    // @ts-ignore
+    // eslint-disable-next-line no-underscore-dangle
+    const user2Id = await user2Page.evaluate(() => window.__userId__);
+
+    await user2Page.click("text='8'");
+    await user2Page.click("text=Submit");
+
+    await user1Page.evaluate(() =>
+      document.getElementById("cheat-btn").removeAttribute("disabled")
+    );
+
+    await user1Page.click('text="Cheat"');
+
+    expect(await user2Page.$(`text=${user1Id} just cheated`)).not.toBeNull();
+    expect(await user2Page.$(`text=${user2Id}: 8`)).toBeNull();
+    expect(await user1Page.$("text=Hehe...")).not.toBeNull();
+    expect(await user1Page.$(`text=${user2Id}: 8`)).not.toBeNull();
   });
 });
