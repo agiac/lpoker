@@ -3,7 +3,7 @@ const { test } = require("@playwright/test");
 const { nanoid } = require("nanoid");
 
 test.describe("The home page", () => {
-  const homePage = `http://localhost:3000`;
+  const homePage = `http://localhost:${process.env.SERVER_PORT}`;
 
   test("should redirect to the desired room", async ({ page }) => {
     const roomId = nanoid();

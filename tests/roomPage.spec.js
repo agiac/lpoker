@@ -5,7 +5,7 @@ const { test, expect } = require("@playwright/test");
 test.describe("The room page", () => {
   const roomId = nanoid(6);
 
-  const roomPage = `http://localhost:3000/rooms/${roomId}`;
+  const roomPage = `http://localhost:${process.env.SERVER_PORT}/rooms/${roomId}`;
 
   test("when a new user joins a room, him and the other participants should be notified", async ({
     browser,

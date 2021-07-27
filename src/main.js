@@ -1,11 +1,6 @@
-const http = require("http");
+const { App } = require("./app");
 
-const { app } = require("./app");
-const { createWebSocketServer } = require("./ws");
-
-const server = http.createServer(app);
-
-createWebSocketServer(server);
+const server = App();
 
 server.listen(3000, () => {
   // eslint-disable-next-line no-console
