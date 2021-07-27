@@ -1,5 +1,12 @@
+/**
+ * @param {string} message
+ */
 export const sendNotification = (message) => {
   const notificationList = document.getElementById("notifications-list");
+
+  if (!notificationList) {
+    return;
+  }
 
   const notification = document.createElement("li");
   notification.textContent = message;
@@ -10,7 +17,7 @@ export const sendNotification = (message) => {
     notificationList.prepend(notification);
   }
 
-  if (notificationList.children.length >= 10) {
+  if (notificationList.children.length >= 10 && notificationList.lastChild) {
     notificationList.removeChild(notificationList.lastChild);
   }
 };

@@ -1,57 +1,76 @@
 const WebSocket = require("ws");
 
+/**
+ * @typedef {(props: {roomId: string, senderId: string, data: Record<string, any>, ws: WebSocket }) => void} EventHandler
+ */
+
+/**
+ * @type {Map<string, WebSocket>}
+ */
 const clients = new Map();
 
+/**
+ * @type {Record<string, Record<string, string>>}
+ */
 const votes = {};
 
+/**
+ * @param {string} roomId
+ * @param {{event: string, data?: Record<string, any>}} event
+ */
 const broadcast = (roomId, event) => {
   if (votes[roomId]) {
     Object.keys(votes[roomId]).forEach((client) => {
-      clients.get(client).send(JSON.stringify(event));
+      clients.get(client)?.send(JSON.stringify(event));
     });
   }
 };
 
-const onConnected = (ws, data) => {
-  const { roomId, userId } = data;
-
+/**
+ * @type {EventHandler}
+ */
+const onConnected = ({ roomId, senderId, ws }) => {
   if (!(roomId in votes)) {
-    votes[roomId] = { [userId]: "" };
+    votes[roomId] = { [senderId]: "" };
   } else {
-    votes[roomId][userId] = "";
+    votes[roomId][senderId] = "";
   }
 
-  clients.set(userId, ws);
+  clients.set(senderId, ws);
 
   broadcast(roomId, {
     event: "new-member",
     data: {
-      userId,
-      members: Object.keys(votes[roomId]).filter((member) => member !== userId),
+      userId: senderId,
+      members: Object.keys(votes[roomId]).filter(
+        (member) => member !== senderId
+      ),
     },
   });
 };
 
-const onVote = (data) => {
-  const { roomId, userId, vote } = data;
-
-  votes[roomId][userId] = vote;
+/**
+ * @type {EventHandler}
+ */
+const onVote = ({ data, roomId, senderId }) => {
+  votes[roomId][senderId] = data.vote;
 
   broadcast(roomId, {
     event: "voted",
     data: {
-      userId,
+      userId: senderId,
     },
   });
 };
 
-const onShowResults = (data) => {
-  const { roomId, userId: requester } = data;
-
+/**
+ * @type {EventHandler}
+ */
+const onShowResults = ({ roomId, senderId }) => {
   broadcast(roomId, {
     event: "show-results",
     data: {
-      requester,
+      requester: senderId,
       votes: Object.entries(votes[roomId]).reduce(
         (previous, [userId, vote]) =>
           typeof vote === "string" && vote !== ""
@@ -63,22 +82,26 @@ const onShowResults = (data) => {
   });
 };
 
-const onNewSession = (data) => {
-  const { roomId, userId: requester } = data;
-
+/**
+ * @type {EventHandler}
+ */
+const onNewSession = ({ roomId, senderId }) => {
   broadcast(roomId, {
     event: "new-session",
     data: {
-      requester,
+      requester: senderId,
     },
   });
 
   votes[roomId] = {};
 };
 
+/**
+ * @param {WebSocket} ws
+ */
 const onClose = (ws) => {
-  let disconnectedUser;
-  let roomLeft;
+  let disconnectedUser = "";
+  let roomLeft = "";
 
   clients.forEach((socket, userId) => {
     if (Object.is(ws, socket)) {
@@ -101,24 +124,33 @@ const onClose = (ws) => {
   });
 };
 
-const onMessage = (ws, message) => {
-  const { event, data } = JSON.parse(message.toString());
+/**
+ * @param {WebSocket.Data} message
+ * @param {WebSocket} ws
+ */
+const onMessage = (message, ws) => {
+  const { event, roomId, senderId, data } = JSON.parse(message.toString());
+
+  /**
+   * @param {EventHandler} handler
+   */
+  const onEvent = (handler) => handler({ roomId, senderId, data, ws });
 
   switch (event) {
     case "connected":
-      onConnected(ws, data);
+      onEvent(onConnected);
       break;
 
     case "vote":
-      onVote(data);
+      onEvent(onVote);
       break;
 
     case "show-results":
-      onShowResults(data);
+      onEvent(onShowResults);
       break;
 
     case "new-session":
-      onNewSession(data);
+      onEvent(onNewSession);
       break;
 
     default:
@@ -126,11 +158,14 @@ const onMessage = (ws, message) => {
   }
 };
 
+/**
+ * @param {import("http").Server} httpServer
+ */
 const createWebSocketServer = (httpServer) => {
   const wss = new WebSocket.Server({ server: httpServer });
 
   wss.on("connection", (ws) => {
-    ws.on("message", (message) => onMessage(ws, message));
+    ws.on("message", (message) => onMessage(message, ws));
 
     ws.on("close", () => onClose(ws));
   });

@@ -10,12 +10,7 @@ const wsConnectionString = `${
 }://${window.location.host}`;
 
 const main = () => {
-  const wsClient = new WSClient(wsConnectionString, () => {
-    wsClient.sendEvent("connected", {
-      roomId,
-      userId,
-    });
-  });
+  const wsClient = new WSClient(wsConnectionString, roomId, userId);
 
   setWSEventListeners(wsClient);
 

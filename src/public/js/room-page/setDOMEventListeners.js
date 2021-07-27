@@ -1,62 +1,56 @@
-// @ts-ignore
-// eslint-disable-next-line no-underscore-dangle
-const { __userId__: userId, __roomId__: roomId } = window;
+/**
+ * @typedef {import("./WSClient").WSClient} WSClient
+ *
+ * @typedef {(wsClient: WSClient) => EventListener} EventHandlerCreator
+ */
 
 /**
- * @param {import("./WSClient").WSClient} wsClient
+ * @type {EventHandlerCreator}
  */
-const onVoteSubmit = (wsClient) => (e) => {
+const makeOnVoteSubmit = (wsClient) => (e) => {
   e.preventDefault();
-  const formData = new FormData(e.target);
+  const formData = new FormData(/** @type {HTMLFormElement} */ (e.target));
 
   const vote = formData.get("vote");
 
   wsClient.sendEvent("vote", {
-    userId,
-    roomId,
     vote,
   });
 };
 
 /**
- * @param {import("./WSClient").WSClient} wsClient
+ * @type {EventHandlerCreator}
  */
-const onShowResultsClick = (wsClient) => (e) => {
+const makeOnShowResultsClick = (wsClient) => (e) => {
   e.preventDefault();
 
-  wsClient.sendEvent("show-results", {
-    roomId,
-    userId,
-  });
+  wsClient.sendEvent("show-results");
 };
 
 /**
- * @param {import("./WSClient").WSClient} wsClient
+ * @type {EventHandlerCreator}
  */
-const onStartNewSessionClick = (wsClient) => (e) => {
+const makeOnStartNewSessionClick = (wsClient) => (e) => {
   e.preventDefault();
 
-  wsClient.sendEvent("new-session", {
-    roomId,
-    userId,
-  });
+  wsClient.sendEvent("new-session");
 };
 
 /**
- * @param {import("./WSClient").WSClient} wsClient
+ * @param {WSClient} wsClient
  */
 export const setDOMEventListeners = (wsClient) => {
   document
     .getElementById("voting-form")
-    .addEventListener("submit", onVoteSubmit(wsClient));
+    ?.addEventListener("submit", makeOnVoteSubmit(wsClient));
 
   document
     .getElementById("show-results")
-    .addEventListener("click", onShowResultsClick(wsClient));
+    ?.addEventListener("click", makeOnShowResultsClick(wsClient));
 
   document
     .getElementById("start-new-session")
-    .addEventListener("click", onStartNewSessionClick(wsClient));
+    ?.addEventListener("click", makeOnStartNewSessionClick(wsClient));
 };
 
 export default setDOMEventListeners;

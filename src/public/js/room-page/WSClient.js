@@ -5,34 +5,40 @@ export class WSClient {
   #connectionString;
 
   /**
+   * @type {string}
+   */
+  #roomId;
+
+  /**
+   * @type {string}
+   */
+  #senderId;
+
+  /**
    * @type {WebSocket}
    */
+  // @ts-ignore
   #socket;
 
   /**
-   * @type {() => void}
+   * @type {Map<string, (data: Record<string, any>) => void>}
    */
-  #onOpen;
-
-  /**
-   * @type {Map<string, (data: Object) => void>}
-   */
-  #listeners;
+  #listeners = new Map();
 
   /**
    * @type {number}
    */
-  #reconnectionDelay;
+  #reconnectionDelay = 1000;
 
   /**
    * @param {string} connectionString
-   * @param {() => void} onOpen
+   * @param {string} roomId
+   * @param {string} senderId
    */
-  constructor(connectionString, onOpen) {
+  constructor(connectionString, roomId, senderId) {
     this.#connectionString = connectionString;
-    this.#onOpen = onOpen;
-    this.#listeners = new Map();
-    this.#reconnectionDelay = 1000;
+    this.#roomId = roomId;
+    this.#senderId = senderId;
     this.#connect();
   }
 
@@ -43,7 +49,7 @@ export class WSClient {
       // eslint-disable-next-line no-console
       console.log(`Connection with ${this.#connectionString} open`);
       this.#reconnectionDelay = 1000;
-      this.#onOpen();
+      this.sendEvent("connected");
     });
 
     this.#socket.addEventListener("error", (e) => {
@@ -78,20 +84,23 @@ export class WSClient {
 
   /**
    * @param {string} event
-   * @param {(data: Object) => void} cb
+   * @param {(data: Record<string, any>) => void} cb
    */
   on(event, cb) {
     this.#listeners.set(event, cb);
+    return this;
   }
 
   /**
    * @param {string} event
-   * @param {Object} data
+   * @param {Record<string, any>} [data = {}]
    */
-  sendEvent(event, data) {
+  sendEvent(event, data = {}) {
     this.#socket.send(
       JSON.stringify({
         event,
+        roomId: this.#roomId,
+        senderId: this.#senderId,
         data,
       })
     );

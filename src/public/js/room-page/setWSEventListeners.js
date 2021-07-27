@@ -1,10 +1,17 @@
 import { sendNotification } from "./sendNotificaiton.js";
 import { clearResultsList } from "./clearResultsList.js";
 
+/**
+ * @typedef {(data: Record<string, any>) => void} EventHandler
+ */
+
 // @ts-ignore
 // eslint-disable-next-line no-underscore-dangle
 const { __userId__: userId } = window;
 
+/**
+ * @type {EventHandler}
+ */
 const onNewMember = (data) => {
   if (data.userId === userId) {
     const { members } = data;
@@ -35,6 +42,9 @@ const onNewMember = (data) => {
   }
 };
 
+/**
+ * @type {EventHandler}
+ */
 const onVoted = (data) => {
   if (data.userId === userId) {
     sendNotification("Your vote has been received");
@@ -43,6 +53,9 @@ const onVoted = (data) => {
   }
 };
 
+/**
+ * @type {EventHandler}
+ */
 const onShowResults = (data) => {
   const { votes, requester } = data;
 
@@ -57,10 +70,13 @@ const onShowResults = (data) => {
   Object.entries(votes).forEach(([user, vote]) => {
     const voteItem = document.createElement("li");
     voteItem.textContent = `${user}: ${vote}`;
-    resultsList.appendChild(voteItem);
+    resultsList?.appendChild(voteItem);
   });
 };
 
+/**
+ * @type {EventHandler}
+ */
 const onNewSession = (data) => {
   const { requester } = data;
 
@@ -73,6 +89,9 @@ const onNewSession = (data) => {
   clearResultsList();
 };
 
+/**
+ * @type {EventHandler}
+ */
 const onExit = (data) => {
   sendNotification(`User ${data.userId} left the room`);
 };
@@ -81,15 +100,12 @@ const onExit = (data) => {
  * @param {import("./WSClient.js").WSClient} wsClient
  */
 export const setWSEventListeners = (wsClient) => {
-  wsClient.on("new-member", onNewMember);
-
-  wsClient.on("voted", onVoted);
-
-  wsClient.on("show-results", onShowResults);
-
-  wsClient.on("new-session", onNewSession);
-
-  wsClient.on("exit", onExit);
+  wsClient
+    .on("new-member", onNewMember)
+    .on("voted", onVoted)
+    .on("show-results", onShowResults)
+    .on("new-session", onNewSession)
+    .on("exit", onExit);
 };
 
 export default setWSEventListeners;

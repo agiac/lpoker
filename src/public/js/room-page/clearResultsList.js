@@ -1,7 +1,7 @@
 export const clearResultsList = () => {
   const resultsList = document.getElementById("results-list");
 
-  while (resultsList.children.length > 0) {
+  while (resultsList && resultsList.lastChild) {
     resultsList.removeChild(resultsList.lastChild);
   }
 

@@ -1,9 +1,10 @@
-const { nanoid } = require("nanoid");
+// eslint-disable-next-line import/no-unresolved
+const { humanId } = require("human-id");
 
 const { test, expect } = require("@playwright/test");
 
 test.describe("The room page", () => {
-  const roomId = nanoid(6);
+  const roomId = humanId();
 
   const roomPage = `http://localhost:${process.env.SERVER_PORT}/rooms/${roomId}`;
 
