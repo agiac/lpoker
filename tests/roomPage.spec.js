@@ -168,4 +168,18 @@ test.describe("The room page", () => {
     expect(await user2Page.$(`text=${user1Id}: 5`)).toBeNull();
     expect(await user2Page.$(`text=${user2Id}: 8`)).toBeNull();
   });
+
+  test("should have the 'Cheat' button disabled by default", async ({
+    page,
+  }) => {
+    await page.goto(roomPage);
+
+    const cheatButton = await page.$('text="Cheat"');
+
+    const isDisabled = await cheatButton.evaluate(
+      (element) => element.getAttribute("disabled").toLowerCase() === "true"
+    );
+
+    expect(isDisabled).toBeTruthy();
+  });
 });

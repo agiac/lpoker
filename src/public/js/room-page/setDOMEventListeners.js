@@ -41,15 +41,15 @@ const makeOnStartNewSessionClick = (wsClient) => (e) => {
  */
 export const setDOMEventListeners = (wsClient) => {
   document
-    .getElementById("voting-form")
+    .getElementById("voting-form-btn")
     ?.addEventListener("submit", makeOnVoteSubmit(wsClient));
 
   document
-    .getElementById("show-results")
+    .getElementById("show-results-btn")
     ?.addEventListener("click", makeOnShowResultsClick(wsClient));
 
   document
-    .getElementById("start-new-session")
+    .getElementById("start-new-session-btn")
     ?.addEventListener("click", makeOnStartNewSessionClick(wsClient));
 };
 
