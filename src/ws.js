@@ -86,14 +86,17 @@ const onShowResults = ({ roomId, senderId }) => {
  * @type {EventHandler}
  */
 const onNewSession = ({ roomId, senderId }) => {
+  votes[roomId] = Object.keys(votes[roomId]).reduce(
+    (room, userId) => ({ ...room, [userId]: "" }),
+    {}
+  );
+
   broadcast(roomId, {
     event: "new-session",
     data: {
       requester: senderId,
     },
   });
-
-  votes[roomId] = {};
 };
 
 /**
