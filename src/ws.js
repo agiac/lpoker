@@ -168,9 +168,9 @@ const createWebSocketServer = (httpServer) => {
   const wss = new WebSocket.Server({ server: httpServer });
 
   wss.on("connection", (ws) => {
-    ws.on("message", (message) => onMessage(message, ws));
-
-    ws.on("close", () => onClose(ws));
+    ws.on("message", (message) => onMessage(message, ws)).on("close", () =>
+      onClose(ws)
+    );
   });
 };
 
