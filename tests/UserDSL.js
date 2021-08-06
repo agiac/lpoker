@@ -20,7 +20,7 @@ class UserDSL {
    * @returns {Promise<string>}
    */
   async joinRoom(roomId) {
-    await this.page.goto(
+    await this.page?.goto(
       `http://localhost:${process.env.SERVER_PORT}/rooms/${roomId}`
     );
     // @ts-ignore
@@ -32,37 +32,30 @@ class UserDSL {
    * @param {string | number} vote
    */
   async vote(vote) {
-    await this.page.click(`text='${vote}'`);
-    await this.page.click("text=Submit");
+    await this.page?.click(`text='${vote}'`);
+    await this.page?.click("text=Submit");
   }
 
   async showResults() {
-    await this.page.click("text=Show results");
+    await this.page?.click("text=Show results");
   }
 
   async startNewSession() {
-    await this.page.click("text=Start new session");
+    await this.page?.click("text=Start new session");
   }
 
   async cheat() {
-    await this.page.evaluate(() =>
-      document.getElementById("cheat-btn").removeAttribute("disabled")
+    await this.page?.evaluate(() =>
+      document.getElementById("cheat-btn")?.removeAttribute("disabled")
     );
-    await this.page.click('text="Cheat"');
+    await this.page?.click('text="Cheat"');
   }
 
   /**
    * @param {string} query
    */
   query(query) {
-    return this.page.$(`text=${query}`);
-  }
-
-  /**
-   * @param {string} text
-   */
-  async sees(text) {
-    return (await this.page.waitForSelector(`text=${text}`)) !== null;
+    return this.page?.$(`text=${query}`);
   }
 }
 
