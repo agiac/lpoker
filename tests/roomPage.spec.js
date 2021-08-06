@@ -1,3 +1,4 @@
+// @ts-nocheck
 // eslint-disable-next-line import/no-unresolved
 const { humanId } = require("human-id");
 
