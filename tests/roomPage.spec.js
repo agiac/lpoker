@@ -3,73 +3,7 @@ const { humanId } = require("human-id");
 
 const { test, expect } = require("@playwright/test");
 
-class User {
-  /**
-   * @param {import("@playwright/test").Browser} browser
-   */
-  constructor(browser) {
-    /**
-     * @type {import("@playwright/test").Browser}
-     */
-    this.browser = browser;
-  }
-
-  async startSession() {
-    const context = await this.browser.newContext();
-    this.page = await context.newPage();
-    return this;
-  }
-
-  /**
-   * @param {string} roomId
-   * @returns {Promise<string>}
-   */
-  async joinRoom(roomId) {
-    await this.page.goto(
-      `http://localhost:${process.env.SERVER_PORT}/rooms/${roomId}`
-    );
-    // @ts-ignore
-    // eslint-disable-next-line no-underscore-dangle
-    return this.page.evaluate(() => window.__userId__);
-  }
-
-  /**
-   * @param {string | number} vote
-   */
-  async vote(vote) {
-    await this.page.click(`text='${vote}'`);
-    await this.page.click("text=Submit");
-  }
-
-  async showResults() {
-    await this.page.click("text=Show results");
-  }
-
-  async startNewSession() {
-    await this.page.click("text=Start new session");
-  }
-
-  async cheat() {
-    await this.page.evaluate(() =>
-      document.getElementById("cheat-btn").removeAttribute("disabled")
-    );
-    await this.page.click('text="Cheat"');
-  }
-
-  /**
-   * @param {string} query
-   */
-  query(query) {
-    return this.page.$(`text=${query}`);
-  }
-
-  /**
-   * @param {string} text
-   */
-  async sees(text) {
-    return (await this.page.waitForSelector(`text=${text}`)) !== null;
-  }
-}
+const UserDSL = require("./UserDSL");
 
 test.describe("The room page", () => {
   const roomId = humanId();
@@ -77,8 +11,8 @@ test.describe("The room page", () => {
   test("when a new user joins a room, him and the other participants should be notified", async ({
     browser,
   }) => {
-    const user1 = await new User(browser).startSession();
-    const user2 = await new User(browser).startSession();
+    const user1 = await new UserDSL(browser).startSession();
+    const user2 = await new UserDSL(browser).startSession();
 
     const user1Id = await user1.joinRoom(roomId);
     const user2Id = await user2.joinRoom(roomId);
@@ -95,8 +29,8 @@ test.describe("The room page", () => {
   test("when a user leaves a room, the other participants should be notified", async ({
     browser,
   }) => {
-    const user1 = await new User(browser).startSession();
-    const user2 = await new User(browser).startSession();
+    const user1 = await new UserDSL(browser).startSession();
+    const user2 = await new UserDSL(browser).startSession();
 
     const user1Id = await user1.joinRoom(roomId);
     await user2.joinRoom(roomId);
@@ -111,8 +45,8 @@ test.describe("The room page", () => {
   test("when a user votes, him and the other participants should be notified", async ({
     browser,
   }) => {
-    const user1 = await new User(browser).startSession();
-    const user2 = await new User(browser).startSession();
+    const user1 = await new UserDSL(browser).startSession();
+    const user2 = await new UserDSL(browser).startSession();
 
     const user1Id = await user1.joinRoom(roomId);
     await user2.joinRoom(roomId);
@@ -129,8 +63,8 @@ test.describe("The room page", () => {
   test("when the 'Show results' button is clicked, all the votes should be displayed", async ({
     browser,
   }) => {
-    const user1 = await new User(browser).startSession();
-    const user2 = await new User(browser).startSession();
+    const user1 = await new UserDSL(browser).startSession();
+    const user2 = await new UserDSL(browser).startSession();
 
     const user1Id = await user1.joinRoom(roomId);
     const user2Id = await user2.joinRoom(roomId);
@@ -156,8 +90,8 @@ test.describe("The room page", () => {
   test("when the 'Start new session' button is clicked, the votes should be cleared", async ({
     browser,
   }) => {
-    const user1 = await new User(browser).startSession();
-    const user2 = await new User(browser).startSession();
+    const user1 = await new UserDSL(browser).startSession();
+    const user2 = await new UserDSL(browser).startSession();
 
     const user1Id = await user1.joinRoom(roomId);
     const user2Id = await user2.joinRoom(roomId);
@@ -185,7 +119,7 @@ test.describe("The room page", () => {
   test("should have the 'Cheat' button disabled by default", async ({
     browser,
   }) => {
-    const user = await new User(browser).startSession();
+    const user = await new UserDSL(browser).startSession();
 
     await user.joinRoom(roomId);
 
@@ -201,8 +135,8 @@ test.describe("The room page", () => {
   test("it should show the results only to the user who clicked the 'Cheat' button and the other users should be notified", async ({
     browser,
   }) => {
-    const user1 = await new User(browser).startSession();
-    const user2 = await new User(browser).startSession();
+    const user1 = await new UserDSL(browser).startSession();
+    const user2 = await new UserDSL(browser).startSession();
 
     const user1Id = await user1.joinRoom(roomId);
     const user2Id = await user2.joinRoom(roomId);
