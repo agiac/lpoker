@@ -27,6 +27,24 @@ test.describe("The room page", () => {
     await expect(user2).toSee(user2Greeting);
   });
 
+  test("when a new user joins a room, his name should appear in the participants list", async ({
+    browser,
+  }) => {
+    const user1 = await new UserDSL(browser).startSession();
+    const user2 = await new UserDSL(browser).startSession();
+
+    const user1Id = await user1.joinRoom(roomId);
+    const user2Id = await user2.joinRoom(roomId);
+
+    const user1ListItem = `${user1Id}: -`;
+    const user2ListItem = `${user2Id}: -`;
+
+    await expect(user1).toSee(user1ListItem);
+    await expect(user1).toSee(user2ListItem);
+    await expect(user2).toSee(user1ListItem);
+    await expect(user2).toSee(user2ListItem);
+  });
+
   test("when a user leaves a room, the other participants should be notified", async ({
     browser,
   }) => {
@@ -50,15 +68,22 @@ test.describe("The room page", () => {
     const user2 = await new UserDSL(browser).startSession();
 
     const user1Id = await user1.joinRoom(roomId);
-    await user2.joinRoom(roomId);
 
+    await user2.joinRoom(roomId);
     await user1.vote(8);
 
     const user1Notification = `Your vote has been received`;
     const user2Notification = `User ${user1Id} just voted`;
+    const user1ListItem = `${user1Id}: ○`;
+
+    await user1.page.screenshot({
+      path: "./ssh.png",
+    });
 
     await expect(user1).toSee(user1Notification);
+    await expect(user1).toSee(user1ListItem);
     await expect(user2).toSee(user2Notification);
+    await expect(user2).toSee(user1ListItem);
   });
 
   test("when the 'Show results' button is clicked, all the votes should be displayed", async ({

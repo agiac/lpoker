@@ -1,5 +1,4 @@
 import { sendNotification } from "./sendNotificaiton.js";
-import { clearResultsList } from "./clearResultsList.js";
 
 /**
  * @typedef {(data: Record<string, any>) => void} EventHandler
@@ -10,11 +9,30 @@ import { clearResultsList } from "./clearResultsList.js";
 const { __userId__: userId } = window;
 
 /**
+ * @param {Record<string, string>} room
+ */
+const updateParticipantsList = (room) => {
+  const participantsList = document.getElementById("participants-list");
+
+  while (participantsList && participantsList.lastChild) {
+    participantsList.removeChild(participantsList.lastChild);
+  }
+
+  Object.entries(room).forEach(([user, vote]) => {
+    const voteItem = document.createElement("li");
+    voteItem.textContent = `${user}: ${vote}`;
+    participantsList?.appendChild(voteItem);
+  });
+};
+
+/**
  * @type {EventHandler}
  */
 const onNewMember = (data) => {
   if (data.userId === userId) {
-    const { members } = data;
+    const { room } = data;
+
+    const members = Object.keys(room);
 
     if (members.length === 0) {
       sendNotification(
@@ -40,6 +58,8 @@ const onNewMember = (data) => {
   } else {
     sendNotification(`User ${data.userId} joined the room`);
   }
+
+  updateParticipantsList(data.room);
 };
 
 /**
@@ -51,13 +71,14 @@ const onVoted = (data) => {
   } else {
     sendNotification(`User ${data.userId} just voted`);
   }
+  updateParticipantsList(data.room);
 };
 
 /**
  * @type {EventHandler}
  */
 const onShowResults = (data) => {
-  const { votes, requester } = data;
+  const { room, requester } = data;
 
   if (requester === userId) {
     sendNotification("Your request has been received");
@@ -65,20 +86,14 @@ const onShowResults = (data) => {
     sendNotification(`User ${requester} requested to see the results`);
   }
 
-  const resultsList = clearResultsList();
-
-  Object.entries(votes).forEach(([user, vote]) => {
-    const voteItem = document.createElement("li");
-    voteItem.textContent = `${user}: ${vote}`;
-    resultsList?.appendChild(voteItem);
-  });
+  updateParticipantsList(room);
 };
 
 /**
  * @type {EventHandler}
  */
 const onNewSession = (data) => {
-  const { requester } = data;
+  const { requester, room } = data;
 
   if (requester === userId) {
     sendNotification("Your request has been received");
@@ -86,7 +101,7 @@ const onNewSession = (data) => {
     sendNotification(`User ${requester} requested to start a new session`);
   }
 
-  clearResultsList();
+  updateParticipantsList(room);
 };
 
 /**
@@ -104,23 +119,20 @@ const onCheat = (data) => {
  * @type {EventHandler}
  */
 const onCheatResults = (data) => {
-  const { votes } = data;
+  const { room } = data;
 
-  if (Object.entries(votes).length === 0) {
+  if (
+    Object.entries(room).filter(
+      ([user, vote]) => user !== userId && vote !== ""
+    ).length === 0
+  ) {
     sendNotification("No one else voted yet 😬");
     return;
   }
 
   sendNotification("Hehe... 😉");
 
-  const resultsList = clearResultsList();
-
-  Object.entries(votes).forEach(([user, vote]) => {
-    if (user === userId) return;
-    const voteItem = document.createElement("li");
-    voteItem.textContent = `${user}: ${vote}`;
-    resultsList?.appendChild(voteItem);
-  });
+  updateParticipantsList(room);
 };
 
 /**
@@ -128,6 +140,7 @@ const onCheatResults = (data) => {
  */
 const onExit = (data) => {
   sendNotification(`User ${data.userId} left the room`);
+  updateParticipantsList(data.room);
 };
 
 /**

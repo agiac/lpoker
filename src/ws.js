@@ -16,6 +16,27 @@ const votes = {};
 
 /**
  * @param {string} roomId
+ */
+const getRoomWithVotes = (roomId) =>
+  Object.entries(votes[roomId]).reduce(
+    (previous, [userId, vote]) => ({ ...previous, [userId]: vote }),
+    {}
+  );
+
+/**
+ * @param {string} roomId
+ */
+const getRoomWithoutVotes = (roomId) =>
+  Object.entries(votes[roomId]).reduce(
+    (previous, [userId, vote]) => ({
+      ...previous,
+      [userId]: vote !== "" ? "○" : "-",
+    }),
+    {}
+  );
+
+/**
+ * @param {string} roomId
  * @param {{event: string, data?: Record<string, any>}} event
  */
 const broadcast = (roomId, event) => {
@@ -42,9 +63,7 @@ const onConnected = ({ roomId, senderId, ws }) => {
     event: "new-member",
     data: {
       userId: senderId,
-      members: Object.keys(votes[roomId]).filter(
-        (member) => member !== senderId
-      ),
+      room: getRoomWithoutVotes(roomId),
     },
   });
 };
@@ -59,6 +78,7 @@ const onVote = ({ data, roomId, senderId }) => {
     event: "voted",
     data: {
       userId: senderId,
+      room: getRoomWithoutVotes(roomId),
     },
   });
 };
@@ -71,13 +91,7 @@ const onShowResults = ({ roomId, senderId }) => {
     event: "show-results",
     data: {
       requester: senderId,
-      votes: Object.entries(votes[roomId]).reduce(
-        (previous, [userId, vote]) =>
-          typeof vote === "string" && vote !== ""
-            ? { ...previous, [userId]: vote }
-            : previous,
-        {}
-      ),
+      room: getRoomWithVotes(roomId),
     },
   });
 };
@@ -95,6 +109,7 @@ const onNewSession = ({ roomId, senderId }) => {
     event: "new-session",
     data: {
       requester: senderId,
+      room: getRoomWithoutVotes(roomId),
     },
   });
 };
@@ -109,13 +124,7 @@ const onCheat = ({ roomId, senderId }) => {
     JSON.stringify({
       event: "cheat-results",
       data: {
-        votes: Object.entries(votes[roomId]).reduce(
-          (previous, [userId, vote]) =>
-            typeof vote === "string" && vote !== "" && userId !== senderId
-              ? { ...previous, [userId]: vote }
-              : previous,
-          {}
-        ),
+        room: getRoomWithVotes(roomId),
       },
     })
   );
@@ -124,6 +133,7 @@ const onCheat = ({ roomId, senderId }) => {
     event: "cheat",
     data: {
       cheater: senderId,
+      room: getRoomWithoutVotes(roomId),
     },
   });
 };
@@ -152,6 +162,7 @@ const onClose = (ws) => {
     event: "exit",
     data: {
       userId: disconnectedUser,
+      room: getRoomWithoutVotes(roomLeft),
     },
   });
 };
