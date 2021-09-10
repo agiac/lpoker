@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 
 /**
- * @typedef {(props: {roomId: string, senderId: string, data: Record<string, any>, ws: WebSocket }) => void} EventHandler
+ * @typedef {(props: {roomId: string, senderId: string, senderNick: string, data: Record<string, any>, ws: WebSocket }) => void} EventHandler
  */
 
 /**
@@ -10,7 +10,7 @@ const WebSocket = require("ws");
 const clients = new Map();
 
 /**
- * @type {Record<string, Record<string, string>>}
+ * @type {Record<string, Record<string, {nick: string, vote: string}>>}
  */
 const votes = {};
 
@@ -30,7 +30,10 @@ const getRoomWithoutVotes = (roomId) =>
   Object.entries(votes[roomId]).reduce(
     (previous, [userId, vote]) => ({
       ...previous,
-      [userId]: vote !== "" ? "○" : "-",
+      [userId]: {
+        ...vote,
+        vote: vote.vote !== "" ? "○" : "-",
+      },
     }),
     {}
   );
@@ -50,11 +53,19 @@ const broadcast = (roomId, event) => {
 /**
  * @type {EventHandler}
  */
-const onConnected = ({ roomId, senderId, ws }) => {
+const onConnected = ({ roomId, senderId, senderNick, ws }) => {
   if (!(roomId in votes)) {
-    votes[roomId] = { [senderId]: "" };
+    votes[roomId] = {
+      [senderId]: {
+        nick: senderNick,
+        vote: "",
+      },
+    };
   } else {
-    votes[roomId][senderId] = "";
+    votes[roomId][senderId] = {
+      nick: senderNick,
+      vote: "",
+    };
   }
 
   clients.set(senderId, ws);
@@ -72,7 +83,7 @@ const onConnected = ({ roomId, senderId, ws }) => {
  * @type {EventHandler}
  */
 const onVote = ({ data, roomId, senderId }) => {
-  votes[roomId][senderId] = data.vote;
+  votes[roomId][senderId].vote = data.vote;
 
   broadcast(roomId, {
     event: "voted",
@@ -172,12 +183,15 @@ const onClose = (ws) => {
  * @param {WebSocket} ws
  */
 const onMessage = (message, ws) => {
-  const { event, roomId, senderId, data } = JSON.parse(message.toString());
+  const { event, roomId, senderId, senderNick, data } = JSON.parse(
+    message.toString()
+  );
 
   /**
    * @param {EventHandler} handler
    */
-  const onEvent = (handler) => handler({ roomId, senderId, data, ws });
+  const onEvent = (handler) =>
+    handler({ roomId, senderId, senderNick, data, ws });
 
   switch (event) {
     case "connected":
