@@ -9,11 +9,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/join-room", (req, res) => {
-  const { room } = req.query;
-
-  res.setHeader("Location", `/rooms/${room}`);
-
-  res.status(303).end();
+  res.redirect(`/rooms/${req.query.room}`);
 });
 
 router.get("/rooms/:roomId", (req, res) => {

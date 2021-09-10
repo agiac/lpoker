@@ -76,10 +76,6 @@ test.describe("The room page", () => {
     const user2Notification = `User ${user1Id} just voted`;
     const user1ListItem = `${user1Id}: ○`;
 
-    await user1.page.screenshot({
-      path: "./ssh.png",
-    });
-
     await expect(user1).toSee(user1Notification);
     await expect(user1).toSee(user1ListItem);
     await expect(user2).toSee(user2Notification);
