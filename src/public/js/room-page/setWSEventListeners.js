@@ -9,7 +9,7 @@ import { sendNotification } from "./sendNotificaiton.js";
 const { __userId__: userId } = window;
 
 /**
- * @param {Record<string, {nick: string, vote: string}>} room
+ * @param {Record<string, string>} room
  */
 const updateParticipantsList = (room) => {
   const participantsList = document.getElementById("participants-list");
@@ -18,7 +18,7 @@ const updateParticipantsList = (room) => {
     participantsList.removeChild(participantsList.lastChild);
   }
 
-  Object.entries(room).forEach(([user, { vote }]) => {
+  Object.entries(room).forEach(([user, vote]) => {
     const voteItem = document.createElement("li");
     voteItem.textContent = `${user}: ${vote}`;
     participantsList?.appendChild(voteItem);
